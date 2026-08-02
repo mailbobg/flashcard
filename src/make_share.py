@@ -22,11 +22,17 @@ def fonts_css():
 
 
 def shoot(html_path, out, w, h):
+    """Chrome 截图出 PNG，再转成 JPEG。分享图是渐变底，JPEG 体积只有 PNG 的三成，
+    而抓取器（尤其微信）对慢响应会直接放弃，体积就是成败关键。"""
+    from PIL import Image
+    png = out + '.tmp.png'
     subprocess.run([CHROME, '--headless=new', '--disable-gpu', '--hide-scrollbars',
                     '--force-device-scale-factor=1', '--default-background-color=FFFFFFFF',
-                    '--window-size=%d,%d' % (w, h), '--screenshot=' + out,
+                    '--window-size=%d,%d' % (w, h), '--screenshot=' + png,
                     'file://' + html_path], check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    Image.open(png).convert('RGB').save(out, 'JPEG', quality=86, optimize=True, progressive=True)
+    os.unlink(png)
     print('  %s  %dx%d  %d KB' % (os.path.basename(out), w, h, os.path.getsize(out) / 1024))
 
 
@@ -53,8 +59,8 @@ if __name__ == '__main__':
     fd, tmp = tempfile.mkstemp(suffix='.html')
     os.write(fd, html.encode('utf-8')); os.close(fd)
     try:
-        shoot(tmp, os.path.join(ROOT, 'share.png'), 1200, 630)
-        shoot(tmp, os.path.join(ROOT, 'share-square.png'), 640, 640)
+        shoot(tmp, os.path.join(ROOT, 'share.jpg'), 1200, 630)
+        shoot(tmp, os.path.join(ROOT, 'share-square.jpg'), 640, 640)
     finally:
         os.unlink(tmp)
     icon(os.path.join(ROOT, 'apple-touch-icon.png'), 180)
