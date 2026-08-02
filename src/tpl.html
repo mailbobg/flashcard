@@ -77,6 +77,7 @@
   --color-background-green:light-dark(#24BB5E26,#24BB5E33);
   --color-background-purple:light-dark(#7952FF26,#7952FF33);
   --color-background-cyan:light-dark(#03A7D726,#03A7D733);
+  --color-neutral:light-dark(rgba(5,54,89,.1),rgba(223,226,229,.2));
   --color-accent:light-dark(#15110C,#DFE2E5);
   --color-on-accent:light-dark(#FFFFFF,#15110C);
   --color-accent-muted:light-dark(rgba(21,17,12,.08),rgba(223,226,229,.14));
@@ -324,9 +325,11 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .ex .rowbtn{margin-top:var(--spacing-3);display:flex;gap:var(--spacing-2);flex-wrap:wrap}
 
 /* ---------- 翻译思路：按句子成分上色 ---------- */
-/* 与 .blk2（记忆法）、.ex（例句）保持同一套：色块填充、无描边、无阴影 */
+/* 与 .blk2（记忆法）、.ex（例句）同一套：色块填充、无描边、无阴影。
+   不另起色相——例句是 5% 中性灰，这里用 10% 的同色相（Astryx --color-neutral），
+   靠明度分层，既能区分又不跟暖琥珀打架 */
 .tr{
-  background:var(--color-background-muted);border-radius:var(--radius-container);
+  background:var(--color-neutral);border-radius:var(--radius-container);
   padding:var(--spacing-4);margin-top:var(--spacing-3);
 }
 .tr-hd{
@@ -399,6 +402,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .zhline .zk.d{background:var(--color-background-yellow);color:var(--color-text-yellow)}
 .zhline .zk.a{background:var(--color-background-purple);color:var(--color-text-purple)}
 .zhline .zk.c{background:var(--color-background-cyan);color:var(--color-text-cyan)}
+.zhline .zk.x{background:var(--color-accent-muted);color:var(--color-text-primary)}
 .zhline .ar{color:var(--color-text-disabled);font-size:var(--font-size-sm)}
 .tr-final{
   margin-top:11px;padding:11px 13px;background:var(--color-background-card);
@@ -776,12 +780,11 @@ function transHTML(w) {
   const t = w.tr;
   const flow = t.flow.map(([en, zh, r]) =>
     `<div class="fl"><span class="fe">${esc(en)}</span><span class="fz ${r || 'x'}">${esc(zh)}</span></div>`).join('');
-  const tree = t.tree.map(([lv, en, zh]) =>
+  const tree = (t.tree || []).map(([lv, en, zh]) =>
     `<div class="tv l${lv}">${lv ? '<span class="br">└</span>' : ''}
       <span class="te ${lv ? 'd' : 'h'}">${esc(en)}</span><span class="tz">${esc(zh)}</span></div>`).join('');
-  const asm = t.asm.map((z, i) =>
-    (i ? '<span class="ar">→</span>' : '') +
-    `<span class="zk ${i === t.asm.length - 1 ? 'h' : 'd'}">${esc(z)}</span>`).join('');
+  const asm = (t.asm || []).map(([z, r], i) =>
+    (i ? '<span class="ar">→</span>' : '') + `<span class="zk ${r || 'x'}">${esc(z)}</span>`).join('');
   const shift = t.shift
     ? `<div class="tr-step">词性转换</div>
        <div class="nom"><b>${esc(t.shift[0])}</b><span class="ar">→</span><b>${esc(t.shift[1])}</b>
@@ -796,12 +799,13 @@ function transHTML(w) {
     <div class="tr-step">② 主干</div>
     <div class="core"><div class="ce">${esc(t.core[0])}</div><div class="cz">${esc(t.core[1])}</div></div>
 
-    <div class="tr-step">③ 修饰挂在哪（缩进 = 嵌套层级）</div>
-    <div class="tree">${tree}</div>
+    ${tree ? `<div class="tr-step">③ 修饰挂在哪（缩进 = 嵌套层级）</div>
+    <div class="tree">${tree}</div>` : ''}
     ${shift}
 
-    <div class="tr-step">④ 中文从最里层往外装</div>
-    <div class="zhline">${asm}</div>
+    ${asm ? `<div class="tr-step">${tree ? '④' : '③'} 中文从最里层往外装</div>
+    <div class="zhline">${asm}</div>` : ''}
+    <div class="tr-step">${tree && asm ? '⑤' : (tree || asm) ? '④' : '③'} 完整译文</div>
     <div class="tr-final">${t.final
       ? t.final.map(([z, r]) => `<span class="fw ${r || 'x'}">${esc(z)}</span>`).join('')
       : esc(w.exzh)}</div>

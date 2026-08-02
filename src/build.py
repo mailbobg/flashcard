@@ -70,6 +70,24 @@ def attach_trans(data):
     unknown = set(TRANS) - seen
     if unknown:
         raise SystemExit('trans.py 里有词表中不存在的词条: %s' % sorted(unknown))
+    missing = [w['w'] for s in data['sections'] for w in s['words'] if 'tr' not in w]
+    if missing:
+        print('  ⚠ 尚缺翻译思路 %d 条: %s%s'
+              % (len(missing), ', '.join(missing[:6]), ' …' if len(missing) > 6 else ''))
+    for w, t in TRANS.items():                      # 结构自检
+        for k in ('pat', 'flow', 'core', 'final', 'tip'):
+            if k not in t:
+                raise SystemExit('%s 缺字段 %s' % (w, k))
+        if any(len(x) != 3 for x in t['flow']):
+            raise SystemExit('%s 的 flow 每项要写成 [英文, 中文, 成分]' % w)
+    # final 各段拼起来必须与原书译文完全一致，防止标注时漏字或改写
+    for s in data['sections']:
+        for w in s['words']:
+            if 'tr' not in w:
+                continue
+            joined = ''.join(seg[0] for seg in w['tr']['final'])
+            if re.sub(r'\s+', '', joined) != re.sub(r'\s+', '', w['exzh']):
+                raise SystemExit('%s 的 final 拼接与译文不符:\n  %s\n  %s' % (w['w'], joined, w['exzh']))
     return n
 
 
