@@ -3,6 +3,8 @@
 手机端 H5 背单词应用，覆盖 IGCSE 自然科学核心词汇 **164 词 + 10 组句型**。
 单个 `index.html`，**零外部请求、可离线使用**，浏览器打开即可。
 
+线上地址：**<https://flash.imyway.cn/>**
+
 ## 功能
 
 **发音**
@@ -52,6 +54,12 @@ python3 src/build.py                                      # 生成 index.html
 | `src/tpl.html` | 应用模板，含样式、逻辑与内嵌字体，`__DATA__` 为词条占位符 |
 | `src/data.json` | 合成后的词条数据 |
 | `src/build.py` | 合成数据并注入模板，产出根目录 `index.html`（含音节拼写校验） |
+| `src/share.html` | 分享卡片设计稿，复用应用内嵌的 Figtree |
+| `src/make_share.py` | Chrome headless 出图：`share.jpg` / `share-square.jpg` / 图标 |
+
+换域名时改 `src/build.py` 顶部的 `BASE` 一行再重新构建即可——`og:image`
+必须是绝对地址，模板里统一用 `__BASE__` 占位。分享图改动后需重跑
+`python3 src/make_share.py`。
 
 `src/phon.py` 的音节格式为 `拼写=音标`，音节间用 `|`，短语中的词间用 ` / ` 分隔：
 
