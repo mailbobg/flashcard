@@ -70,6 +70,13 @@
   --color-text-yellow:light-dark(#753F07,#FBCE03);
   --color-text-green:light-dark(#09441F,#A5F690);
   --color-text-blue:light-dark(#042F97,#AFD7FF);
+  --color-text-purple:light-dark(#3E0697,#B3B0FE);
+  --color-text-cyan:light-dark(#014975,#A1EEF9);
+  --color-background-red:light-dark(#E3193B26,#E3193B33);
+  --color-background-yellow:light-dark(#E2A40033,#E2A40033);
+  --color-background-green:light-dark(#24BB5E26,#24BB5E33);
+  --color-background-purple:light-dark(#7952FF26,#7952FF33);
+  --color-background-cyan:light-dark(#03A7D726,#03A7D733);
   --color-accent:light-dark(#15110C,#DFE2E5);
   --color-on-accent:light-dark(#FFFFFF,#15110C);
   --color-accent-muted:light-dark(rgba(21,17,12,.08),rgba(223,226,229,.14));
@@ -314,7 +321,49 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .ex{background:var(--color-background-muted);border-radius:var(--radius-container);padding:var(--spacing-4);margin-top:var(--spacing-3)}
 .ex .en{font-size:var(--font-size-lg);line-height:1.5;font-weight:var(--font-weight-medium)}
 .ex .cn{font-size:var(--font-size-base);color:var(--color-text-secondary);margin-top:7px}
-.ex .rowbtn{margin-top:var(--spacing-3);display:flex;gap:var(--spacing-2)}
+.ex .rowbtn{margin-top:var(--spacing-3);display:flex;gap:var(--spacing-2);flex-wrap:wrap}
+
+/* ---------- 翻译思路：按句子成分上色 ---------- */
+.tr{margin-top:var(--spacing-3);display:none}
+.tr.on{display:block}
+.tr .pat{
+  display:inline-block;font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);
+  background:var(--color-accent-muted);border-radius:var(--radius-full);padding:4px 11px;letter-spacing:.03em;
+}
+.chks{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+.chk{border-radius:var(--radius-inner);padding:7px 9px 6px;text-align:left}
+.chk .e{font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);line-height:1.3}
+.chk .z{font-size:var(--font-size-xs);opacity:.85;margin-top:2px}
+.chk .r{font-size:9.5px;opacity:.62;margin-top:3px;letter-spacing:.04em}
+.chk.v{background:var(--color-background-blue);color:var(--color-text-blue)}
+.chk.s{background:var(--color-background-green);color:var(--color-text-green)}
+.chk.h{background:var(--color-background-red);color:var(--color-text-red)}
+.chk.d{background:var(--color-background-yellow);color:var(--color-text-yellow)}
+.chk.a{background:var(--color-background-purple);color:var(--color-text-purple)}
+.chk.c{background:var(--color-background-cyan);color:var(--color-text-cyan)}
+.tr-step{
+  display:flex;align-items:center;gap:8px;margin:13px 0 9px;
+  font-size:var(--font-size-xs);color:var(--color-text-secondary);font-weight:var(--font-weight-medium);
+}
+.tr-step::after{content:"";flex:1;height:var(--border-width);background:var(--color-border-emphasized);opacity:.55}
+.zhline{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.zhline .zk{
+  font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);
+  border-radius:var(--radius-inner);padding:4px 9px;
+}
+.zhline .zk.v{background:var(--color-background-blue);color:var(--color-text-blue)}
+.zhline .zk.s{background:var(--color-background-green);color:var(--color-text-green)}
+.zhline .zk.h{background:var(--color-background-red);color:var(--color-text-red)}
+.zhline .zk.d{background:var(--color-background-yellow);color:var(--color-text-yellow)}
+.zhline .zk.a{background:var(--color-background-purple);color:var(--color-text-purple)}
+.zhline .zk.c{background:var(--color-background-cyan);color:var(--color-text-cyan)}
+.zhline .ar{color:var(--color-text-disabled);font-size:var(--font-size-sm)}
+.tr-final{
+  margin-top:11px;padding:11px 13px;background:var(--color-background-card);
+  border:var(--border-width) solid var(--color-border-emphasized);border-radius:var(--radius-element);
+  font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);
+}
+.tr-tip{font-size:var(--font-size-xs);color:var(--color-text-secondary);line-height:1.75;margin-top:10px}
 
 /* 评分 */
 .actwrap{flex:0 0 auto;padding:var(--spacing-3) var(--spacing-4) calc(var(--safe-b) + var(--spacing-3))}
@@ -485,7 +534,8 @@ function applyTheme() {
 const IC = {
   spk: '<svg viewBox="0 0 24 24"><path d="M11 5L6.5 9H3v6h3.5L11 19z"/><path d="M14.8 9.6a3.4 3.4 0 0 1 0 4.8"/><path d="M17.4 7a7 7 0 0 1 0 10"/></svg>',
   slow: '<svg viewBox="0 0 24 24"><path d="M11 5L6.5 9H3v6h3.5L11 19z"/><path d="M14.8 9.6a3.4 3.4 0 0 1 0 4.8"/></svg>',
-  play: '<svg viewBox="0 0 24 24"><path d="M7.5 4.8l11 7.2-11 7.2z"/></svg>'
+  play: '<svg viewBox="0 0 24 24"><path d="M7.5 4.8l11 7.2-11 7.2z"/></svg>',
+  chunk: '<svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="7" height="5.5" rx="1.8"/><rect x="12" y="5.5" width="9" height="5.5" rx="1.8"/><rect x="3" y="13" width="10" height="5.5" rx="1.8"/><rect x="15" y="13" width="6" height="5.5" rx="1.8"/></svg>'
 };
 applyTheme();
 
@@ -673,6 +723,30 @@ function cutHTML(w) {
   });
   return h;
 }
+/* ---------- 翻译思路 ----------
+   上排按英语原序显示意群，下排按 order 重排成中文语序，同一成分同色，
+   让「后置定语要前移」这件事用颜色直接看出来 */
+const ROLE = { v: '谓语', s: '主语', h: '中心词', d: '定语', a: '状语', c: '从句' };
+function transHTML(w) {
+  const t = w.tr;
+  const chks = t.ch.map(([en, zh, r]) =>
+    `<div class="chk ${r}"><div class="e">${esc(en)}</div><div class="z">${esc(zh)}</div>
+     <div class="r">${ROLE[r] || ''}</div></div>`).join('');
+  const zh = t.order.map((i, n) => {
+    const [, z, r] = t.ch[i];
+    return (n ? '<span class="ar">+</span>' : '') + `<span class="zk ${r}">${esc(z)}</span>`;
+  }).join('');
+  return `<div class="tr" id="trBox">
+    <span class="pat">${esc(t.pat)}</span>
+    <div class="tr-step">① 切意群，标成分</div>
+    <div class="chks">${chks}</div>
+    <div class="tr-step">② 按中文语序重装（定语搬到中心词前）</div>
+    <div class="zhline">${zh}</div>
+    <div class="tr-final">${esc(w.exzh)}</div>
+    <div class="tr-tip">${esc(t.tip)}</div>
+  </div>`;
+}
+
 const sameSplit = w => w.syl.map(x => x.map(s => s.t).join('|')).join(' ')
   === w.w.split(/[\s-]+/).map(x => letterSplit(x).join('|')).join(' ');
 
@@ -947,7 +1021,9 @@ function drawCard(speak) {
         <div class="rowbtn">
           <button class="btn tiny" data-a="ex">${IC.spk} 读例句</button>
           <button class="btn tiny" data-a="exslow">${IC.slow} 慢速</button>
+          ${w.tr ? `<button class="btn tiny" data-a="tr">${IC.chunk} 翻译思路</button>` : ''}
         </div>
+        ${w.tr ? transHTML(w) : ''}
       </div>
     </div>
     <div class="hint">轻点卡片返回正面　·　左右滑动切换单词</div>`;
@@ -966,6 +1042,7 @@ $('card3d').addEventListener('click', e => {
     else if (a === 'slow') say(w.w, SLOW);
     else if (a === 'ex') say(w.ex);
     else if (a === 'exslow') say(w.ex, SLOW + .05);
+    else if (a === 'tr') { const el = $('trBox'); if (el) el.classList.toggle('on'); }
     else if (a === 'seq') playSeq(w);
     return;
   }

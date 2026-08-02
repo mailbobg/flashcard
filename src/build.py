@@ -13,6 +13,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 from phon import PHON                       # noqa: E402
+from trans import TRANS                     # noqa: E402
 
 
 def logo_svg():
@@ -56,6 +57,22 @@ def build_data():
     return out
 
 
+def attach_trans(data):
+    """把例句的翻译思路挂上去。独立于 build_data——没有 parsed.json、
+    直接吃缓存 data.json 时也要生效。"""
+    n, seen = 0, set()
+    for s in data['sections']:
+        for w in s['words']:
+            if w['w'] in TRANS:
+                w['tr'] = TRANS[w['w']]; n += 1; seen.add(w['w'])
+            else:
+                w.pop('tr', None)                  # 标注被删掉时同步清掉
+    unknown = set(TRANS) - seen
+    if unknown:
+        raise SystemExit('trans.py 里有词表中不存在的词条: %s' % sorted(unknown))
+    return n
+
+
 def check(data):
     """音节拼写拼回原词必须一致，否则说明 PHON 写错了"""
     bad = []
@@ -73,6 +90,7 @@ def check(data):
 if __name__ == '__main__':
     data = build_data()
     n = check(data)
+    ntr = attach_trans(data)
     tpl = open(os.path.join(HERE, 'tpl.html'), encoding='utf-8').read()
     assert '__DATA__' in tpl, 'tpl.html 缺少 __DATA__ 占位符'
     assert '__BASE__' in tpl, 'tpl.html 缺少 __BASE__ 占位符'
@@ -83,4 +101,5 @@ if __name__ == '__main__':
                .replace('__BASE__', BASE))
     dst = os.path.join(ROOT, 'index.html')
     open(dst, 'w', encoding='utf-8').write(html)
-    print('built %s — %d 词, %d KB' % (dst, n, round(os.path.getsize(dst) / 1024)))
+    print('built %s — %d 词（%d 句带翻译思路）, %d KB'
+          % (dst, n, ntr, round(os.path.getsize(dst) / 1024)))
