@@ -324,7 +324,15 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .ex .rowbtn{margin-top:var(--spacing-3);display:flex;gap:var(--spacing-2);flex-wrap:wrap}
 
 /* ---------- 翻译思路：按句子成分上色 ---------- */
-.tr{margin-top:var(--spacing-4)}
+.tr{
+  margin-top:var(--spacing-3);background:var(--color-background-card);
+  border:var(--border-width) solid var(--color-border-emphasized);
+  border-radius:var(--radius-container);padding:var(--spacing-4);box-shadow:var(--shadow-low);
+}
+.tr-hd{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);
+}
 .tr .pat{
   display:inline-block;font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);
   background:var(--color-accent-muted);border-radius:var(--radius-full);padding:4px 11px;letter-spacing:.03em;
@@ -376,7 +384,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .nom em{font-style:normal;font-size:var(--font-size-xs);color:var(--color-text-purple);opacity:.75;margin-left:auto}
 .nom .ar{color:var(--color-text-purple);opacity:.6}
 .tr-step{
-  display:flex;align-items:center;gap:8px;margin:13px 0 9px;
+  display:flex;align-items:center;gap:8px;margin:15px 0 9px;
   font-size:var(--font-size-xs);color:var(--color-text-secondary);font-weight:var(--font-weight-medium);
 }
 .tr-step::after{content:"";flex:1;height:var(--border-width);background:var(--color-border-emphasized);opacity:.55}
@@ -779,7 +787,7 @@ function transHTML(w) {
        <div class="nom"><b>${esc(t.shift[0])}</b><span class="ar">→</span><b>${esc(t.shift[1])}</b>
        <em>${esc(t.shift[2])}</em></div>` : '';
   return `<div class="tr" id="trBox">
-    <span class="pat">${esc(t.pat)}</span>
+    <div class="tr-hd">翻译思路<span class="pat">${esc(t.pat)}</span></div>
 
     <div class="tr-step">① 顺着读，不回头</div>
     <div class="flow">${flow}</div>
@@ -1076,8 +1084,8 @@ function drawCard(speak) {
           <button class="btn tiny" data-a="ex">${IC.spk} 读例句</button>
           <button class="btn tiny" data-a="exslow">${IC.slow} 慢速</button>
         </div>
-        ${w.tr ? transHTML(w) : ''}
       </div>
+      ${w.tr ? transHTML(w) : ''}
     </div>
     <div class="hint">轻点卡片返回正面　·　左右滑动切换单词</div>`;
 
