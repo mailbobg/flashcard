@@ -3,10 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#f1f4f8">
+<meta name="theme-color" content="#F8F4ED">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>IGCSE 科学词汇闪卡</title>
+<meta name="apple-mobile-web-app-title" content="科学词汇">
+<meta name="format-detection" content="telephone=no">
+<title>IGCSE 科学词汇闪卡 · 164 词带音标拆音节</title>
+<meta name="description" content="164 个 IGCSE 自然科学核心词汇，每个词都有英式音标、一元一辅音节拆分和逐音节朗读跟读，配词根助记与例句。打开即用，离线可背。">
+
+<!-- 分享卡片（微信 / 朋友圈 / 各类 IM 抓取用），换域名时改 og:url 与 og:image 即可 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="IGCSE 科学词汇闪卡">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:url" content="https://mailbobg.github.io/flashcard/">
+<meta property="og:title" content="IGCSE 科学词汇闪卡 · 164 词带音标拆音节">
+<meta property="og:description" content="英式音标 + 一元一辅音节拆分 + 逐音节朗读跟读，配词根助记与间隔重复。打开即用，离线可背。">
+<meta property="og:image" content="https://mailbobg.github.io/flashcard/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="observation 拆成 ob·ser·va·tion 四块，每块标注音标">
+<!-- 微信缩略图按方图裁切，单独给一张 -->
+<meta property="og:image" content="https://mailbobg.github.io/flashcard/share-square.png">
+<meta name="thumbnail" content="https://mailbobg.github.io/flashcard/share-square.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="IGCSE 科学词汇闪卡 · 164 词带音标拆音节">
+<meta name="twitter:description" content="英式音标 + 一元一辅音节拆分 + 逐音节朗读跟读，配词根助记与间隔重复。">
+<meta name="twitter:image" content="https://mailbobg.github.io/flashcard/share.png">
+
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315110C'/%3E%3Cg fill='%23fff'%3E%3Crect x='9' y='9' width='6' height='6' rx='1.4'/%3E%3Crect x='17' y='9' width='6' height='6' rx='1.4'/%3E%3Crect x='9' y='17' width='6' height='6' rx='1.4'/%3E%3Crect x='17' y='17' width='6' height='6' rx='1.4'/%3E%3C/g%3E%3C/svg%3E">
 <style>
 /* ============================================================
    Astryx design tokens — astryx.atmeta.com
@@ -84,6 +110,7 @@
 }
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+.ogimg{position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
 html,body{height:100%}
 body{
   background:var(--color-background-body); color:var(--color-text-primary); overflow:hidden;
@@ -372,6 +399,8 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 </style>
 </head>
 <body>
+<!-- 微信抓不到 og:image 时会退而扫描页面里的第一张图，这里给它一张；文件缺失就自行移除 -->
+<img class="ogimg" src="share-square.png" width="640" height="640" alt="IGCSE 科学词汇闪卡" onerror="this.remove()">
 <div id="app">
   <div class="hd">
     <span class="mark"><i></i><i></i><i></i><i></i></span>
