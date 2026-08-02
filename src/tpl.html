@@ -335,7 +335,15 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .fl{display:flex;align-items:baseline;gap:10px;padding:5px 0}
 .fl + .fl{border-top:var(--border-width) dashed var(--color-border-emphasized)}
 .fl .fe{font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);flex:1;min-width:0}
-.fl .fz{font-size:var(--font-size-base);color:var(--color-text-blue);flex:0 0 auto;text-align:right}
+.fl .fz{font-size:var(--font-size-base);flex:0 0 auto;text-align:right;font-weight:var(--font-weight-medium)}
+/* 成分配色，限定在 .tr 内：.v/.c 等单字母类名在音节砖那边已占用 */
+.tr .v{color:var(--color-text-blue)}
+.tr .s{color:var(--color-text-green)}
+.tr .h{color:var(--color-text-red)}
+.tr .d{color:var(--color-text-yellow)}
+.tr .a{color:var(--color-text-purple)}
+.tr .c{color:var(--color-text-cyan)}
+.tr .x{color:var(--color-text-primary)}
 .tr-note{font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-top:8px;line-height:1.7}
 
 /* ② 主干 */
@@ -390,6 +398,11 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
   border:var(--border-width) solid var(--color-border-emphasized);border-radius:var(--radius-element);
   font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);
 }
+.tr-final .fw{
+  font-weight:var(--font-weight-semibold);
+  text-decoration:underline 2px;text-underline-offset:5px;text-decoration-skip-ink:none;
+}
+.tr-final .fw.x{text-decoration:none}
 .tr-tip{font-size:var(--font-size-xs);color:var(--color-text-secondary);line-height:1.75;margin-top:10px}
 
 /* 评分 */
@@ -755,8 +768,8 @@ function cutHTML(w) {
    让「后置定语要前移」这件事用颜色直接看出来 */
 function transHTML(w) {
   const t = w.tr;
-  const flow = t.flow.map(([en, zh]) =>
-    `<div class="fl"><span class="fe">${esc(en)}</span><span class="fz">${esc(zh)}</span></div>`).join('');
+  const flow = t.flow.map(([en, zh, r]) =>
+    `<div class="fl"><span class="fe">${esc(en)}</span><span class="fz ${r || 'x'}">${esc(zh)}</span></div>`).join('');
   const tree = t.tree.map(([lv, en, zh]) =>
     `<div class="tv l${lv}">${lv ? '<span class="br">└</span>' : ''}
       <span class="te ${lv ? 'd' : 'h'}">${esc(en)}</span><span class="tz">${esc(zh)}</span></div>`).join('');
@@ -783,7 +796,9 @@ function transHTML(w) {
 
     <div class="tr-step">④ 中文从最里层往外装</div>
     <div class="zhline">${asm}</div>
-    <div class="tr-final">${esc(w.exzh)}</div>
+    <div class="tr-final">${t.final
+      ? t.final.map(([z, r]) => `<span class="fw ${r || 'x'}">${esc(z)}</span>`).join('')
+      : esc(w.exzh)}</div>
     <div class="tr-tip">${esc(t.tip)}</div>
   </div>`;
 }
