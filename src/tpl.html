@@ -324,8 +324,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .ex .rowbtn{margin-top:var(--spacing-3);display:flex;gap:var(--spacing-2);flex-wrap:wrap}
 
 /* ---------- 翻译思路：按句子成分上色 ---------- */
-.tr{margin-top:var(--spacing-3);display:none}
-.tr.on{display:block}
+.tr{margin-top:var(--spacing-4)}
 .tr .pat{
   display:inline-block;font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);
   background:var(--color-accent-muted);border-radius:var(--radius-full);padding:4px 11px;letter-spacing:.03em;
@@ -574,8 +573,7 @@ function applyTheme() {
 const IC = {
   spk: '<svg viewBox="0 0 24 24"><path d="M11 5L6.5 9H3v6h3.5L11 19z"/><path d="M14.8 9.6a3.4 3.4 0 0 1 0 4.8"/><path d="M17.4 7a7 7 0 0 1 0 10"/></svg>',
   slow: '<svg viewBox="0 0 24 24"><path d="M11 5L6.5 9H3v6h3.5L11 19z"/><path d="M14.8 9.6a3.4 3.4 0 0 1 0 4.8"/></svg>',
-  play: '<svg viewBox="0 0 24 24"><path d="M7.5 4.8l11 7.2-11 7.2z"/></svg>',
-  chunk: '<svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="7" height="5.5" rx="1.8"/><rect x="12" y="5.5" width="9" height="5.5" rx="1.8"/><rect x="3" y="13" width="10" height="5.5" rx="1.8"/><rect x="15" y="13" width="6" height="5.5" rx="1.8"/></svg>'
+  play: '<svg viewBox="0 0 24 24"><path d="M7.5 4.8l11 7.2-11 7.2z"/></svg>'
 };
 applyTheme();
 
@@ -1077,7 +1075,6 @@ function drawCard(speak) {
         <div class="rowbtn">
           <button class="btn tiny" data-a="ex">${IC.spk} 读例句</button>
           <button class="btn tiny" data-a="exslow">${IC.slow} 慢速</button>
-          ${w.tr ? `<button class="btn tiny" data-a="tr">${IC.chunk} 翻译思路</button>` : ''}
         </div>
         ${w.tr ? transHTML(w) : ''}
       </div>
@@ -1098,7 +1095,6 @@ $('card3d').addEventListener('click', e => {
     else if (a === 'slow') say(w.w, SLOW);
     else if (a === 'ex') say(w.ex);
     else if (a === 'exslow') say(w.ex, SLOW + .05);
-    else if (a === 'tr') { const el = $('trBox'); if (el) el.classList.toggle('on'); }
     else if (a === 'seq') playSeq(w);
     return;
   }
