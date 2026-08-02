@@ -1,0 +1,8 @@
+.DS_Store
+.claude/
+__pycache__/
+*.pyc
+src/parsed.json
+
+# 词表原始 PDF 不入库（版权归原作者）
+*.pdf
