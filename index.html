@@ -324,13 +324,13 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .ex .rowbtn{margin-top:var(--spacing-3);display:flex;gap:var(--spacing-2);flex-wrap:wrap}
 
 /* ---------- 翻译思路：按句子成分上色 ---------- */
+/* 与 .blk2（记忆法）、.ex（例句）保持同一套：色块填充、无描边、无阴影 */
 .tr{
-  margin-top:var(--spacing-3);background:var(--color-background-card);
-  border:var(--border-width) solid var(--color-border-emphasized);
-  border-radius:var(--radius-container);padding:var(--spacing-4);box-shadow:var(--shadow-low);
+  background:var(--color-background-muted);border-radius:var(--radius-container);
+  padding:var(--spacing-4);margin-top:var(--spacing-3);
 }
 .tr-hd{
-  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:2px;
   font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);
 }
 .tr .pat{
