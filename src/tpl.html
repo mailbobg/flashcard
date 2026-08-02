@@ -38,7 +38,7 @@
 <meta name="twitter:image" content="__BASE__share.jpg">
 
 <link rel="apple-touch-icon" href="__BASE__apple-touch-icon.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315110C'/%3E%3Cg fill='%23fff'%3E%3Crect x='9' y='9' width='6' height='6' rx='1.4'/%3E%3Crect x='17' y='9' width='6' height='6' rx='1.4'/%3E%3Crect x='9' y='17' width='6' height='6' rx='1.4'/%3E%3Crect x='17' y='17' width='6' height='6' rx='1.4'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="__LOGO_URI__">
 <link rel="icon" type="image/png" sizes="32x32" href="__BASE__favicon.png">
 <style>
 /* ============================================================
@@ -138,11 +138,8 @@ body::before{
   padding:calc(var(--safe-t) + 16px) var(--spacing-5) var(--spacing-3);
   display:flex;align-items:center;gap:10px;flex:0 0 auto;
 }
-.mark{
-  flex:0 0 auto;width:26px;height:26px;border-radius:var(--radius-inner);background:var(--color-accent);
-  display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:6px;
-}
-.mark i{background:var(--color-on-accent);border-radius:1.5px}
+.mark{flex:0 0 auto;width:32px;height:32px;display:block}
+.mark svg{width:100%;height:100%;display:block}
 .hd h1{font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);letter-spacing:-.01em}
 .hd .sub{font-size:var(--font-size-xs);color:var(--color-text-secondary);font-weight:400;margin-top:1px}
 main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 var(--spacing-5) var(--spacing-6)}
@@ -410,7 +407,7 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 <img class="ogimg" src="share-square.jpg" width="640" height="640" alt="IGCSE 科学词汇闪卡" onerror="this.remove()">
 <div id="app">
   <div class="hd">
-    <span class="mark"><i></i><i></i><i></i><i></i></span>
+    <span class="mark">__LOGO__</span>
     <div>
       <h1 id="hdT">IGCSE 科学词汇</h1>
       <div class="sub" id="hdS">164 词 · 音标 · 拆音节 · 朗读</div>

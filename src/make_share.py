@@ -5,12 +5,13 @@
 产物：share.png (1200x630)、share-square.png (640x640)、apple-touch-icon.png (180x180)
 依赖：Chrome（渲染 HTML）、Pillow（画图标）
 """
-import os, re, subprocess, tempfile
+import os, re, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-INK = (21, 17, 12)
+sys.path.insert(0, HERE)
+from build import logo_svg                     # noqa: E402  标志的唯一来源
 
 
 def fonts_css():
@@ -36,26 +37,34 @@ def shoot(html_path, out, w, h):
     print('  %s  %dx%d  %d KB' % (os.path.basename(out), w, h, os.path.getsize(out) / 1024))
 
 
-def icon(out, size=180):
-    """主屏图标：墨色圆角方块 + 四个白点，与应用内的 mark 一致"""
-    from PIL import Image, ImageDraw
-    ss, s = 4, size * 4                       # 4 倍超采样再缩小，边缘更干净
-    im = Image.new('RGBA', (s, s), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 0, s - 1, s - 1], radius=int(s * .225), fill=INK + (255,))
-    pad, gap = int(s * .27), int(s * .055)
-    cell = (s - pad * 2 - gap) // 2
-    for row in range(2):
-        for col in range(2):
-            x = pad + col * (cell + gap)
-            y = pad + row * (cell + gap)
-            d.rounded_rectangle([x, y, x + cell, y + cell], radius=int(cell * .22), fill=(255, 255, 255, 255))
-    im.resize((size, size), Image.LANCZOS).save(out)
+ICON_HTML = ('<style>html,body{margin:0;width:{S}px;height:{S}px;background:{BG};overflow:hidden}'
+             'body{display:flex;align-items:center;justify-content:center}'
+             'svg{flex:0 0 auto;width:{L}px;height:{L}px;display:block}</style>{SVG}')
+
+
+def icon(out, size, bg, fill=86):
+    """从 src/logo.svg 渲染图标。bg 传 'transparent' 则出透明底。
+    iOS 主屏图标不支持透明（会被合成到黑底），所以要给实底。
+    尺寸用绝对像素——百分比在 flex 容器里对无固有尺寸的 SVG 解析不可靠。"""
+    html = (ICON_HTML.replace('{S}', str(size)).replace('{BG}', bg)
+            .replace('{L}', str(round(size * fill / 100))).replace('{SVG}', logo_svg()))
+    fd, tmp = tempfile.mkstemp(suffix='.html')
+    os.write(fd, html.encode('utf-8')); os.close(fd)
+    try:
+        subprocess.run([CHROME, '--headless=new', '--disable-gpu', '--hide-scrollbars',
+                        '--force-device-scale-factor=1',
+                        '--default-background-color=' + ('00000000' if bg == 'transparent' else 'FFFFFFFF'),
+                        '--window-size=%d,%d' % (size, size), '--screenshot=' + out,
+                        'file://' + tmp], check=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    finally:
+        os.unlink(tmp)
     print('  %s  %dx%d  %d KB' % (os.path.basename(out), size, size, os.path.getsize(out) / 1024))
 
 
 if __name__ == '__main__':
-    html = open(os.path.join(HERE, 'share.html'), encoding='utf-8').read().replace('__FONTS__', fonts_css())
+    html = (open(os.path.join(HERE, 'share.html'), encoding='utf-8').read()
+            .replace('__FONTS__', fonts_css()).replace('__LOGO__', logo_svg()))
     fd, tmp = tempfile.mkstemp(suffix='.html')
     os.write(fd, html.encode('utf-8')); os.close(fd)
     try:
@@ -63,5 +72,5 @@ if __name__ == '__main__':
         shoot(tmp, os.path.join(ROOT, 'share-square.jpg'), 640, 640)
     finally:
         os.unlink(tmp)
-    icon(os.path.join(ROOT, 'apple-touch-icon.png'), 180)
-    icon(os.path.join(ROOT, 'favicon.png'), 32)      # 不支持 SVG favicon 的内置浏览器用它
+    icon(os.path.join(ROOT, 'apple-touch-icon.png'), 180, '#F8F4ED', fill=78)
+    icon(os.path.join(ROOT, 'favicon.png'), 32, 'transparent', fill=100)
