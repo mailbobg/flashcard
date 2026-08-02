@@ -57,4 +57,5 @@ if __name__ == '__main__':
         shoot(tmp, os.path.join(ROOT, 'share-square.png'), 640, 640)
     finally:
         os.unlink(tmp)
-    icon(os.path.join(ROOT, 'apple-touch-icon.png'))
+    icon(os.path.join(ROOT, 'apple-touch-icon.png'), 180)
+    icon(os.path.join(ROOT, 'favicon.png'), 32)      # 不支持 SVG favicon 的内置浏览器用它

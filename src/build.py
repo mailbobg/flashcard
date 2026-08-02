@@ -6,6 +6,9 @@
 """
 import json, os, re, sys
 
+# 站点根地址。og:image / og:url 必须是绝对地址，换域名只改这一行（末尾保留斜杠）
+BASE = 'https://flash.imyway.cn/'
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
@@ -61,7 +64,10 @@ if __name__ == '__main__':
     n = check(data)
     tpl = open(os.path.join(HERE, 'tpl.html'), encoding='utf-8').read()
     assert '__DATA__' in tpl, 'tpl.html 缺少 __DATA__ 占位符'
-    html = tpl.replace('__DATA__', json.dumps(data, ensure_ascii=False, separators=(',', ':')))
+    assert '__BASE__' in tpl, 'tpl.html 缺少 __BASE__ 占位符'
+    assert BASE.endswith('/'), 'BASE 末尾要有斜杠'
+    html = (tpl.replace('__DATA__', json.dumps(data, ensure_ascii=False, separators=(',', ':')))
+               .replace('__BASE__', BASE))
     dst = os.path.join(ROOT, 'index.html')
     open(dst, 'w', encoding='utf-8').write(html)
     print('built %s — %d 词, %d KB' % (dst, n, round(os.path.getsize(dst) / 1024)))
