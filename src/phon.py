@@ -174,4 +174,21 @@ PHON = {
 "pollution": ("pol=pə|lu=ˈluː|tion=ʃn", "pollut（弄脏）→ 污染；空气污染危害健康。"),
 "greenhouse gas": ("green=ˈɡriːn|house=haʊs / gas=ɡæs", "温室气体（CO₂、CH₄）：像玻璃房一样把热留住。"),
 "conservation": ("con=ˌkɒn|ser=sə|va=ˈveɪ|tion=ʃn", "con- + serve（保存）→ 保护物种与栖息地（也指「守恒」，如能量守恒）。"),
+# ——— 衔接课程补充词汇（见 src/extra.py）———
+"Brownian motion": ("Brow=ˈbraʊ|ni=ni|an=ən / mo=ˈməʊ|tion=ʃn",
+    "以植物学家 Brown 命名——他 1827 年用显微镜看到花粉在水中乱抖，"
+    "才推断出是水分子在不停撞它。这是「分子在动」最直接的证据。"),
+"random": ("ran=ˈræn|dom=dəm",
+    "方向不断变、没有固定路线。关键：扩散是随机运动叠加后的「总体」结果，"
+    "不是每个粒子都朝低浓度直线走。"),
+"high concentration": ("high=haɪ / con=ˌkɒn|cen=sən|tra=ˈtreɪ|tion=ʃn",
+    "concentration（浓度）+ high → 单位体积内粒子多的那一侧，扩散的起点。"),
+"low concentration": ("low=ləʊ / con=ˌkɒn|cen=sən|tra=ˈtreɪ|tion=ʃn",
+    "与 high concentration 成对记：净移动的方向永远是由高指向低。"),
+"net movement": ("net=net / move=ˈmuːv|ment=mənt",
+    "net 是「净、总」的意思（同 net weight 净重）→ 把所有随机运动叠加之后，"
+    "剩下的那个总体方向。答扩散定义时这个词不能漏。"),
+"relative molecular mass": ("rel=ˈre|a=lə|tive=tɪv / mo=mə|le=ˈle|cu=kjʊ|lar=lə / mass=mæs",
+    "relative（相对的）+ molecular（分子的）+ mass（质量）→ 一个分子中各原子"
+    "相对质量之和，记作 Mr。Mr 越小，同条件下扩散越快。"),
 }

@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="科学词汇">
 <meta name="format-detection" content="telephone=no">
-<title>IGCSE 科学词汇闪卡 · 164 词带音标拆音节</title>
-<meta name="description" content="164 个 IGCSE 自然科学核心词汇，每个词都有英式音标、一元一辅音节拆分和逐音节朗读跟读，配词根助记与例句。打开即用，离线可背。">
+<title>IGCSE 科学词汇闪卡 · __N__ 词带音标拆音节</title>
+<meta name="description" content="__N__ 个 IGCSE 自然科学核心词汇，每个词都有英式音标、一元一辅音节拆分和逐音节朗读跟读，配词根助记与例句。打开即用，离线可背。">
 
 <!-- 分享卡片（微信 / 朋友圈 / 各类 IM 抓取用）。__BASE__ 由 src/build.py 的 BASE 常量替换 -->
 <link rel="canonical" href="__BASE__">
@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="IGCSE 科学词汇闪卡">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:url" content="__BASE__">
-<meta property="og:title" content="IGCSE 科学词汇闪卡 · 164 词带音标拆音节">
+<meta property="og:title" content="IGCSE 科学词汇闪卡 · __N__ 词带音标拆音节">
 <meta property="og:description" content="英式音标 + 一元一辅音节拆分 + 逐音节朗读跟读，配词根助记与间隔重复。打开即用，离线可背。">
 <!-- 方图放第一张：微信取首个 og:image 并按方形裁切，横图会被切掉两边 -->
 <meta property="og:image" content="__BASE__share-square.jpg">
@@ -33,7 +33,7 @@
 <meta name="thumbnail" content="__BASE__share-square.jpg">
 <meta itemprop="image" content="__BASE__share-square.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="IGCSE 科学词汇闪卡 · 164 词带音标拆音节">
+<meta name="twitter:title" content="IGCSE 科学词汇闪卡 · __N__ 词带音标拆音节">
 <meta name="twitter:description" content="英式音标 + 一元一辅音节拆分 + 逐音节朗读跟读，配词根助记与间隔重复。">
 <meta name="twitter:image" content="__BASE__share.jpg">
 
@@ -474,6 +474,56 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .fr .en{font-size:var(--font-size-base);color:var(--color-text-secondary);margin-top:9px;line-height:1.6}
 .fr .cn{font-size:var(--font-size-sm);color:var(--color-text-disabled);margin-top:4px}
 
+/* ---------- 课前预习 ---------- */
+.lhero{padding:var(--spacing-5);margin-top:var(--spacing-3)}
+.ltag{
+  display:inline-block;font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);
+  background:var(--color-accent);color:var(--color-on-accent);
+  border-radius:var(--radius-full);padding:4px 11px;letter-spacing:.03em;
+}
+.ltitle{font-size:var(--font-size-2xl);font-weight:var(--font-weight-semibold);letter-spacing:-.02em;margin-top:11px;line-height:1.3}
+.lsub{font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-top:6px}
+.lintro{
+  margin-top:var(--spacing-4);padding-top:var(--spacing-3);
+  border-top:var(--border-width) solid var(--color-border);
+  font-size:var(--font-size-sm);color:var(--color-text-secondary);line-height:1.8;
+}
+.lcard .no{background:var(--color-brand)}
+/* 勾选行 */
+.chkrow{
+  display:flex;align-items:flex-start;gap:11px;padding:13px var(--spacing-4);
+  border-bottom:var(--border-width) solid var(--color-border);
+  font-size:var(--font-size-base);line-height:1.55;
+}
+.chkrow:last-child{border-bottom:0}
+.chkrow:active{background:var(--color-background-muted)}
+.tick{
+  flex:0 0 auto;width:21px;height:21px;border-radius:var(--radius-inner);margin-top:1px;
+  border:1.8px solid var(--color-border-emphasized);
+  display:flex;align-items:center;justify-content:center;
+  transition:background var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard);
+}
+.tick svg{width:14px;height:14px;stroke:var(--color-on-accent);fill:none;stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity var(--duration-fast) var(--ease-standard)}
+.tick.on{background:var(--color-accent);border-color:var(--color-accent)}
+.tick.on svg{opacity:1}
+/* 阅读材料 */
+.read{padding:var(--spacing-4) var(--spacing-5);margin-bottom:var(--spacing-2)}
+.rt{display:flex;align-items:center;gap:9px;font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);letter-spacing:-.01em}
+.rn{
+  flex:0 0 auto;width:22px;height:22px;border-radius:var(--radius-full);
+  background:var(--color-accent-muted);color:var(--color-text-primary);
+  display:flex;align-items:center;justify-content:center;font-size:var(--font-size-xs);font-weight:var(--font-weight-bold);
+}
+.read p{font-size:var(--font-size-base);line-height:1.9;color:var(--color-text-primary);margin-top:10px}
+.read p + p{margin-top:7px}
+.term{
+  background:var(--color-background-blue);color:var(--color-text-blue);border:0;
+  border-radius:var(--radius-inner);padding:1px 6px;font-family:inherit;
+  font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);
+}
+.term:active{background:var(--color-accent-muted)}
+
 /* ---------- 设置 ---------- */
 .setgrp{overflow:hidden;margin-bottom:var(--spacing-2)}
 .set{
@@ -516,13 +566,15 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
     <span class="mark">__LOGO__</span>
     <div>
       <h1 id="hdT">IGCSE 科学词汇</h1>
-      <div class="sub" id="hdS">164 词 · 音标 · 拆音节 · 朗读</div>
+      <div class="sub" id="hdS">音标 · 拆音节 · 朗读</div>
     </div>
   </div>
   <main id="view"></main>
   <nav class="tabbar" id="tabs">
     <button data-t="home" class="on">
       <svg viewBox="0 0 24 24"><path d="M8 7.2V5.7A2.2 2.2 0 0 1 10.2 3.5h8.1A2.2 2.2 0 0 1 20.5 5.7v8.1a2.2 2.2 0 0 1-2.2 2.2h-1.5"/><rect x="3.5" y="8" width="13" height="12.5" rx="2.6"/></svg>学习</button>
+    <button data-t="lesson">
+      <svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="16" rx="2.5"/><path d="M9 5V3.9A1.4 1.4 0 0 1 10.4 2.5h3.2A1.4 1.4 0 0 1 15 3.9V5"/><path d="M8.9 13.4l2.2 2.2 4.2-4.3"/></svg>预习</button>
     <button data-t="list">
       <svg viewBox="0 0 24 24"><path d="M4.2 6.8h1.4M9.4 6.8h10.4M4.2 12h1.4M9.4 12h10.4M4.2 17.2h1.4M9.4 17.2h10.4"/></svg>词表</button>
     <button data-t="frames">
@@ -571,16 +623,18 @@ const BY_W = Object.fromEntries(ALL.map(w => [w.w, w]));
 const KEY = 'igcse-flashcard-v1';
 const DEF = {
   prog: {},                       // word -> {box, due, seen, wrong, star}
+  les: {},                        // 课时 id -> {goals:[], check:[]} 勾选状态
   set: { rate: .95, voice: '', autoSpeak: true, sylMode: 'respell', maskZh: false, theme: 'light' }
 };
 let S = load();
 function load() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) || '{}');
-    return { prog: raw.prog || {}, set: Object.assign({}, DEF.set, raw.set || {}) };
+    return { prog: raw.prog || {}, les: raw.les || {}, set: Object.assign({}, DEF.set, raw.set || {}) };
   } catch (e) { return JSON.parse(JSON.stringify(DEF)); }
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function lrec(id) { return S.les[id] || (S.les[id] = { goals: [], check: [] }); }
 function rec(w) { return S.prog[w] || (S.prog[w] = { box: 0, due: 0, seen: 0, wrong: 0, star: 0 }); }
 function applyTheme() {
   const dark = S.set.theme === 'dark';
@@ -591,7 +645,8 @@ function applyTheme() {
 const IC = {
   spk: '<svg viewBox="0 0 24 24"><path d="M11 5L6.5 9H3v6h3.5L11 19z"/><path d="M14.8 9.6a3.4 3.4 0 0 1 0 4.8"/><path d="M17.4 7a7 7 0 0 1 0 10"/></svg>',
   slow: '<svg viewBox="0 0 24 24"><path d="M11 5L6.5 9H3v6h3.5L11 19z"/><path d="M14.8 9.6a3.4 3.4 0 0 1 0 4.8"/></svg>',
-  play: '<svg viewBox="0 0 24 24"><path d="M7.5 4.8l11 7.2-11 7.2z"/></svg>'
+  play: '<svg viewBox="0 0 24 24"><path d="M7.5 4.8l11 7.2-11 7.2z"/></svg>',
+  tick: '<svg viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg>'
 };
 applyTheme();
 
@@ -844,6 +899,7 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', 
 function render() {
   view.onclick = null;
   if (curView === 'home') renderHome();
+  else if (curView === 'lesson') renderLesson();
   else if (curView === 'list') renderList();
   else if (curView === 'frames') renderFrames();
   else renderMe();
@@ -962,6 +1018,110 @@ function renderList() {
     const r = e.target.closest('.row');
     if (r) startStudy([BY_W[r.dataset.w]], '单词');
   };
+}
+
+/* ---------- 课前预习 ---------- */
+let lesId = null;                                  // null = 课时列表，否则是详情
+
+/* 阅读材料里「中文（english）」的括号内英文做成可点朗读 */
+function inlineTerms(text) {
+  return esc(text).replace(/（([A-Za-z][A-Za-z ,.]*)）/g,
+    (m, en) => `（<button class="term" data-say="${esc(en)}">${esc(en)}</button>）`);
+}
+
+function renderLesson() {
+  const L = (DATA.lessons || []);
+  if (!L.length) { view.innerHTML = '<div class="empty">还没有预习内容</div>'; return; }
+  if (lesId == null) return renderLessonList(L);
+
+  const les = L.find(x => x.id === lesId) || L[0];
+  const r = lrec(les.id);
+  const words = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);
+  const done = words.filter(isMastered).length;
+
+  view.innerHTML = `
+  <button class="btn line" id="lesBack" style="margin-top:4px">← 全部预习</button>
+
+  <div class="card panel lhero">
+    <div class="ltag">第 ${les.id} 节 · 建议 ${les.mins} 分钟</div>
+    <h2 class="ltitle">${esc(les.title)}</h2>
+    <div class="lsub">${esc(les.course)}</div>
+    <div class="lintro">${les.intro.map(t => `<div>· ${esc(t)}</div>`).join('')}</div>
+  </div>
+
+  <div class="sec-t">预习目标</div>
+  <div class="card setgrp">
+    ${les.goals.map((g, i) => `<div class="chkrow" data-k="goals" data-i="${i}">
+      <span class="tick${r.goals[i] ? ' on' : ''}">${IC.tick}</span><span>${esc(g)}</span></div>`).join('')}
+  </div>
+
+  <div class="sec-t">重点词汇 · ${words.length} 词</div>
+  <button class="btn pri blk" id="lesGo">开始学这 ${words.length} 个词${done ? `（已掌握 ${done}）` : ''}</button>
+  <div class="card rowgrp" style="margin-top:8px">
+    ${les.vocab.map(([w, hint]) => {
+      const it = BY_W[w];
+      return `<div class="row" data-w="${esc(w)}">
+        <span class="dot" style="background:${isNew(it) ? 'var(--color-track)'
+          : isMastered(it) ? 'var(--color-success)' : 'var(--color-warning)'}"></span>
+        <div class="bd">
+          <span class="w">${esc(w)}</span><span class="p">${esc(it.ipa)}</span>
+          <div class="z">${esc(it.zh)} · ${esc(hint)}</div>
+        </div>
+        <span class="iconbtn" data-say="${esc(w)}">${IC.spk}</span>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="sec-t">阅读材料</div>
+  ${les.reading.map(([t, ps], i) => `<div class="card read">
+    <div class="rt"><span class="rn">${i + 1}</span>${esc(t)}</div>
+    ${ps.map(x => `<p>${inlineTerms(x)}</p>`).join('')}
+  </div>`).join('')}
+  <div class="tiny muted" style="margin:-2px 2px 0">括号里的英文可以点着听</div>
+
+  <div class="sec-t">上课前自查</div>
+  <div class="card setgrp">
+    ${les.check.map((c, i) => `<div class="chkrow" data-k="check" data-i="${i}">
+      <span class="tick${r.check[i] ? ' on' : ''}">${IC.tick}</span><span>${esc(c)}</span></div>`).join('')}
+  </div>
+  <div class="credit">思考题请在纸上完成</div>`;
+
+  $('lesBack').onclick = () => { lesId = null; view.scrollTop = 0; render(); };
+  $('lesGo').onclick = () => startStudy(words.slice(), `第 ${les.id} 节`);
+  view.onclick = e => {
+    const sp = e.target.closest('[data-say]');
+    if (sp) { e.stopPropagation(); say(sp.dataset.say); return; }
+    const ck = e.target.closest('.chkrow');
+    if (ck) {
+      const a = lrec(les.id)[ck.dataset.k], i = +ck.dataset.i;
+      a[i] = !a[i]; save();
+      ck.querySelector('.tick').classList.toggle('on', !!a[i]);
+      return;
+    }
+    const row = e.target.closest('.row');
+    if (row) startStudy([BY_W[row.dataset.w]], `第 ${les.id} 节`);
+  };
+}
+
+function renderLessonList(L) {
+  view.innerHTML = `<div class="sec-t">课前预习 · ${L.length} 节</div>` +
+    L.map(les => {
+      const ws = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);
+      const d = ws.filter(isMastered).length;
+      return `<button class="card chap lcard" data-les="${les.id}">
+        <div class="no">${les.id}</div>
+        <div class="bd">
+          <div class="t">${esc(les.title)}</div>
+          <div class="e">${ws.length} 词 · ${les.reading.length} 段阅读 · 约 ${les.mins} 分钟</div>
+          <div class="bar"><i style="width:${d / ws.length * 100}%"></i></div>
+        </div>
+        <div class="n">${d}/${ws.length}</div>
+      </button>`;
+    }).join('') +
+    `<div class="credit">词汇与主词库互通，进度不分家</div>`;
+  view.querySelectorAll('[data-les]').forEach(b => b.onclick = () => {
+    lesId = +b.dataset.les; view.scrollTop = 0; render();
+  });
 }
 
 /* ---------- 句型 ---------- */
@@ -1188,6 +1348,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft' && qi > 0) { qi--; drawCard(); }
   if (e.key === 'Escape') $('stClose').click();
 });
+$('hdS').textContent = `${ALL.length} 词 · 音标 · 拆音节 · 朗读`;
 booted = true;
 render();
 </script>

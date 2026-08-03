@@ -14,6 +14,13 @@ sys.path.insert(0, HERE)
 from build import logo_svg                     # noqa: E402  标志的唯一来源
 
 
+def word_count():
+    """分享图上的词数要和应用里一致"""
+    import json
+    d = json.load(open(os.path.join(HERE, 'data.json'), encoding='utf-8'))
+    return sum(len(s['words']) for s in d['sections'])
+
+
 def fonts_css():
     """从 tpl.html 里取出内嵌的 Figtree @font-face，分享图复用同一套字形"""
     tpl = open(os.path.join(HERE, 'tpl.html'), encoding='utf-8').read()
@@ -64,7 +71,8 @@ def icon(out, size, bg, fill=86):
 
 if __name__ == '__main__':
     html = (open(os.path.join(HERE, 'share.html'), encoding='utf-8').read()
-            .replace('__FONTS__', fonts_css()).replace('__LOGO__', logo_svg()))
+            .replace('__FONTS__', fonts_css()).replace('__LOGO__', logo_svg())
+            .replace('__N__', str(word_count())))
     fd, tmp = tempfile.mkstemp(suffix='.html')
     os.write(fd, html.encode('utf-8')); os.close(fd)
     try:

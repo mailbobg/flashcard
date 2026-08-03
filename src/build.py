@@ -14,6 +14,8 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 from phon import PHON                       # noqa: E402
 from trans import TRANS                     # noqa: E402
+from extra import EXTRA                     # noqa: E402
+from lessons import LESSONS                 # noqa: E402
 
 
 def logo_svg():
@@ -27,11 +29,27 @@ def logo_data_uri():
     return 'data:image/svg+xml,' + quote(logo_svg(), safe="/:=<>' ")
 
 
+def enrich(it):
+    """给一个词条补上音标、音节切分与助记。PHON 是唯一来源。"""
+    syl, tip = PHON[it['w']]
+    # "ob=ˌɒb|ser=zə" → [[{t:'ob',p:'ˌɒb'},…]]，词与词之间用 " / " 分隔
+    sw = [[{'t': x.split('=')[0], 'p': x.split('=')[1]} for x in p.split('|')]
+          for p in syl.split(' / ')]
+    ipa = '/' + ' '.join(''.join(y['p'] for y in p) for p in sw) + '/'
+    return {**it, 'ipa': ipa, 'syl': sw, 'tip': tip}
+
+
 def build_data():
     """parsed.json（PDF 原文）+ PHON（手写音标/音节/助记）→ data.json"""
     src = os.path.join(HERE, 'parsed.json')
     if not os.path.exists(src):              # 已经有合成好的 data.json 就直接用
-        return json.load(open(os.path.join(HERE, 'data.json'), encoding='utf-8'))
+        data = json.load(open(os.path.join(HERE, 'data.json'), encoding='utf-8'))
+        have = {w['w'] for s in data['sections'] for w in s['words']}
+        missing = [enrich(it) for it in EXTRA['words'] if it['w'] not in have]
+        if missing:                          # 补充词汇尚未并入缓存时补上
+            data['sections'].append({'id': len(data['sections']) + 1,
+                                     'cn': EXTRA['cn'], 'en': EXTRA['en'], 'words': missing})
+        return data
 
     d = json.load(open(src, encoding='utf-8'))
     out, sid = {'sections': [], 'frames': d['frames']}, 0
@@ -42,19 +60,27 @@ def build_data():
         m = re.search(r'(?<=[一-鿿])(?=[A-Za-z])', body)     # 中英文标题分界
         cn, en = (body[:m.start()].strip(), body[m.start():].strip()) if m else (body, '')
         sid += 1
-        words = []
-        for it in s['items']:
-            syl, tip = PHON[it['w']]
-            # "ob=ˌɒb|ser=zə" → [[{t:'ob',p:'ˌɒb'},…]]，词与词之间用 " / " 分隔
-            sw = [[{'t': x.split('=')[0], 'p': x.split('=')[1]} for x in p.split('|')]
-                  for p in syl.split(' / ')]
-            ipa = '/' + ' '.join(''.join(y['p'] for y in p) for p in sw) + '/'
-            words.append({**it, 'ipa': ipa, 'syl': sw, 'tip': tip})
+        words = [enrich(it) for it in s['items']]
         out['sections'].append({'id': sid, 'cn': cn, 'en': en, 'words': words})
+
+    sid += 1                                   # 衔接课程带来的补充词汇单列一章
+    out['sections'].append({'id': sid, 'cn': EXTRA['cn'], 'en': EXTRA['en'],
+                            'words': [enrich(it) for it in EXTRA['words']]})
 
     json.dump(out, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'),
               ensure_ascii=False, separators=(',', ':'))
     return out
+
+
+def attach_lessons(data):
+    """课时里引用的词必须在词库中查得到，否则「开始学这些词」会点空"""
+    have = {w['w'] for s in data['sections'] for w in s['words']}
+    for les in LESSONS:
+        miss = [v[0] for v in les['vocab'] if v[0] not in have]
+        if miss:
+            raise SystemExit('第 %s 节引用了词库中不存在的词: %s' % (les['id'], miss))
+    data['lessons'] = LESSONS
+    return len(LESSONS)
 
 
 def attach_trans(data):
@@ -109,6 +135,7 @@ if __name__ == '__main__':
     data = build_data()
     n = check(data)
     ntr = attach_trans(data)
+    nles = attach_lessons(data)
     tpl = open(os.path.join(HERE, 'tpl.html'), encoding='utf-8').read()
     assert '__DATA__' in tpl, 'tpl.html 缺少 __DATA__ 占位符'
     assert '__BASE__' in tpl, 'tpl.html 缺少 __BASE__ 占位符'
@@ -116,8 +143,9 @@ if __name__ == '__main__':
     html = (tpl.replace('__DATA__', json.dumps(data, ensure_ascii=False, separators=(',', ':')))
                .replace('__LOGO_URI__', logo_data_uri())      # 顺序要紧：先换 URI，再换裸 SVG
                .replace('__LOGO__', logo_svg())
-               .replace('__BASE__', BASE))
+               .replace('__BASE__', BASE)
+               .replace('__N__', str(n)))
     dst = os.path.join(ROOT, 'index.html')
     open(dst, 'w', encoding='utf-8').write(html)
-    print('built %s — %d 词（%d 句带翻译思路）, %d KB'
-          % (dst, n, ntr, round(os.path.getsize(dst) / 1024)))
+    print('built %s — %d 词（%d 句带翻译思路）, %d 节预习, %d KB'
+          % (dst, n, ntr, nles, round(os.path.getsize(dst) / 1024)))

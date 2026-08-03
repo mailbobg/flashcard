@@ -1640,4 +1640,71 @@ TRANS = {
     "tip": "help 后面可以直接跟动词原形（省略 to）。conservation 也指「守恒」，"
            "如 conservation of energy 能量守恒，看语境判断。",
 },
+
+# ========== 衔接课程补充词汇 ==========
+
+"Brownian motion": {
+    "pat": "主谓宾 + that 同位语从句",
+    "flow": [["Brownian motion", "布朗运动", "s"], ["provides evidence", "提供了证据", "v"],
+             ["that particles are constantly moving", "内容是：粒子一直在动", "c"]],
+    "core": ["Brownian motion provides evidence", "布朗运动提供证据"],
+    "final": [["布朗运动", "s"], ["为", ""], ["粒子持续运动", "c"], ["提供了证据", "v"], ["。", ""]],
+    "tip": "that 从句交代 evidence 的具体内容，是同位语从句不是定语从句。"
+           "中文用「为……提供了证据」这个框架接住。",
+},
+
+"random": {
+    "pat": "主谓 + in 方式状语",
+    "flow": [["Gas particles", "气体粒子", "s"], ["move", "运动", "v"],
+             ["in random directions", "朝随机的方向", "a"]],
+    "core": ["Particles move", "粒子运动"],
+    "final": [["气体粒子", "s"], ["朝随机方向", "a"], ["运动", "v"], ["。", ""]],
+    "tip": "in + 名词表方式，中文提到动词前。directions 用复数，强调方向不止一个、还在变。",
+},
+
+"high concentration": {
+    "pat": "There be 句型 + of 后置定语",
+    "flow": [["There are", "存在", "v"], ["more particles", "更多粒子", "h"],
+             ["in a region", "在一个区域里", "a"], ["of high concentration", "高浓度的", "d"]],
+    "core": ["There are more particles", "有更多粒子"],
+    "tree": [[0, "a region", "区域"], [1, "of high concentration", "高浓度的"]],
+    "asm": [["高浓度", "d"], ["区域内的", "a"], ["粒子更多", "h"]],
+    "final": [["高浓度区域内的", "a"], ["粒子", "h"], ["更多", "v"], ["。", ""]],
+    "tip": "There be 句型直译成「有……」，但中文更常把地点提到句首说「某地有……」。"
+           "of 短语修饰 region，照例前移。",
+},
+
+"low concentration": {
+    "pat": "主谓 + into 方向状语",
+    "flow": [["Particles", "粒子", "s"], ["spread", "扩散开", "v"],
+             ["into the region", "进入那个区域", "a"], ["of low concentration", "低浓度的", "d"]],
+    "core": ["Particles spread", "粒子扩散"],
+    "tree": [[0, "the region", "区域"], [1, "of low concentration", "低浓度的"]],
+    "asm": [["低浓度", "d"], ["区域", "a"]],
+    "final": [["粒子", "s"], ["扩散进入", "v"], ["低浓度区域", "a"], ["。", ""]],
+    "tip": "与 high concentration 那句成对：一个说起点粒子多，一个说粒子往终点去。"
+           "into 强调「进入内部」，比 in 更有方向感。",
+},
+
+"net movement": {
+    "pat": "判断句 + from…to 表语",
+    "flow": [["The net movement", "净移动", "s"], ["is", "是", "v"],
+             ["from high to low concentration", "由高浓度到低浓度", "a"]],
+    "core": ["The net movement is from…to…", "净移动是由……到……"],
+    "final": [["净移动的方向", "s"], ["是", "v"], ["由高浓度到低浓度", "a"], ["。", ""]],
+    "tip": "net = 净、总，指所有随机运动叠加后的结果。中文补出「的方向」，"
+           "否则「净移动是由高到低」读着不完整。",
+},
+
+"relative molecular mass": {
+    "pat": "主语带 with 定语 + 主谓 + 比较级",
+    "flow": [["A gas", "一种气体", "s"], ["with a smaller relative molecular mass", "相对分子质量较小的", "d"],
+             ["diffuses faster", "扩散得更快", "v"]],
+    "core": ["A gas diffuses faster", "气体扩散更快"],
+    "tree": [[0, "A gas", "气体"], [1, "with a smaller relative molecular mass", "相对分子质量较小的"]],
+    "asm": [["相对分子质量较小的", "d"], ["气体", "s"]],
+    "final": [["相对分子质量较小的", "d"], ["气体", "s"], ["扩散更快", "v"], ["。", ""]],
+    "tip": "with 短语作主语的后置定语，中文前移。这正是「氨气比氯化氢扩散快」那道题的依据："
+           "NH₃ 的 Mr≈17，HCl≈36.5。",
+},
 }
