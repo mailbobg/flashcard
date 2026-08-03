@@ -345,10 +345,10 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 }
 /* ① 顺句理解：左英右中，一行一块，靠竖线表示「一直往下滚」 */
 .flow{margin-top:10px;border-left:2px solid var(--color-brand);padding-left:12px}
-.fl{display:flex;align-items:baseline;gap:10px;padding:5px 0}
+.fl{display:flex;align-items:baseline;gap:10px;padding:5px 0;flex-wrap:wrap}
 .fl + .fl{border-top:var(--border-width) dashed var(--color-border-emphasized)}
 .fl .fe{font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);flex:1;min-width:0}
-.fl .fz{font-size:var(--font-size-base);flex:0 0 auto;text-align:right;font-weight:var(--font-weight-medium)}
+.fl .fz{font-size:var(--font-size-base);flex:0 0 auto;margin-left:auto;text-align:right;font-weight:var(--font-weight-medium)}
 /* 成分配色，限定在 .tr 内：.v/.c 等单字母类名在音节砖那边已占用 */
 .tr .v{color:var(--color-text-blue)}
 .tr .s{color:var(--color-text-green)}
@@ -537,10 +537,15 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .rs-say{padding:3px 8px;margin-left:7px;vertical-align:middle;background:var(--color-background-muted)}
 .rs-say svg{width:13px;height:13px}
 .rs-parts{margin-top:10px}
-.pr{display:flex;align-items:baseline;gap:7px;padding:4px 0;flex-wrap:wrap}
-.pz{font-size:var(--font-size-sm);color:var(--color-text-secondary);flex:0 0 auto}
-.pa{color:var(--color-text-disabled);font-size:var(--font-size-sm)}
-.pe{font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);flex:1;min-width:0}
+/* 中英上下排：中文块可能很长，横排会把英文挤成一字一行 */
+.pr{padding:6px 0}
+.pr + .pr{border-top:var(--border-width) solid var(--color-border)}
+.pz{display:block;font-size:var(--font-size-sm);color:var(--color-text-secondary);line-height:1.6}
+.pe{
+  display:block;position:relative;padding-left:17px;margin-top:3px;
+  font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);line-height:1.5;
+}
+.pe::before{content:"→";position:absolute;left:0;top:0;color:var(--color-text-disabled);font-weight:400}
 .pe.v{color:var(--color-text-blue)}
 .pe.s{color:var(--color-text-green)}
 .pe.h{color:var(--color-text-red)}
@@ -1115,8 +1120,7 @@ function renderLessonDetail() {
       ${ss.map(x => `<div class="rs">
         <div class="rs-en">${esc(x.en)}<button class="btn tiny rs-say" data-say="${esc(x.en)}">${IC.spk}</button></div>
         <div class="rs-parts">${x.parts.map(([zh, en, r]) =>
-          `<div class="pr"><span class="pz">${esc(zh)}</span><span class="pa">→</span>
-           <span class="pe ${r || 'x'}">${esc(en)}</span></div>`).join('')}</div>
+          `<div class="pr"><span class="pz">${esc(zh)}</span><span class="pe ${r || 'x'}">${esc(en)}</span></div>`).join('')}</div>
         <div class="rs-note">${esc(x.note)}</div>
       </div>`).join('')}
     </div>
