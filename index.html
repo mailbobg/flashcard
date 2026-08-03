@@ -573,8 +573,6 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
   <nav class="tabbar" id="tabs">
     <button data-t="home" class="on">
       <svg viewBox="0 0 24 24"><path d="M8 7.2V5.7A2.2 2.2 0 0 1 10.2 3.5h8.1A2.2 2.2 0 0 1 20.5 5.7v8.1a2.2 2.2 0 0 1-2.2 2.2h-1.5"/><rect x="3.5" y="8" width="13" height="12.5" rx="2.6"/></svg>学习</button>
-    <button data-t="lesson">
-      <svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="16" rx="2.5"/><path d="M9 5V3.9A1.4 1.4 0 0 1 10.4 2.5h3.2A1.4 1.4 0 0 1 15 3.9V5"/><path d="M8.9 13.4l2.2 2.2 4.2-4.3"/></svg>预习</button>
     <button data-t="list">
       <svg viewBox="0 0 24 24"><path d="M4.2 6.8h1.4M9.4 6.8h10.4M4.2 12h1.4M9.4 12h10.4M4.2 17.2h1.4M9.4 17.2h10.4"/></svg>词表</button>
     <button data-t="frames">
@@ -898,15 +896,14 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', 
 
 function render() {
   view.onclick = null;
-  if (curView === 'home') renderHome();
-  else if (curView === 'lesson') renderLesson();
+  if (curView === 'home') (lesId == null ? renderHome() : renderLessonDetail());
   else if (curView === 'list') renderList();
   else if (curView === 'frames') renderFrames();
   else renderMe();
 }
 $('tabs').onclick = e => {
   const b = e.target.closest('button'); if (!b) return;
-  curView = b.dataset.t;
+  curView = b.dataset.t; lesId = null;
   [...$('tabs').children].forEach(x => x.classList.toggle('on', x === b));
   view.scrollTop = 0; render();
 };
@@ -943,6 +940,8 @@ function renderHome() {
     <button class="btn line" id="goAll" style="flex:1">全部乱序</button>
   </div>
 
+  ${lessonSectionHTML()}
+
   <div class="sec-t">按主题学习</div>
   ${DATA.sections.map(s => {
     const d = s.words.filter(isMastered).length;
@@ -969,9 +968,12 @@ function renderHome() {
     q.length ? startStudy(q, '难词本') : toast('还没有标记的难词');
   };
   $('goAll').onclick = () => startStudy(shuffle(ALL.slice()), '全部乱序');
-  view.querySelectorAll('.chap').forEach(b => b.onclick = () => {
+  view.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => {
     const s = DATA.sections.find(x => x.id == b.dataset.sec);
     startStudy(s.words.slice(), s.cn);
+  });
+  view.querySelectorAll('[data-les]').forEach(b => b.onclick = () => {
+    lesId = +b.dataset.les; view.scrollTop = 0; render();
   });
 }
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0;[a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -1029,18 +1031,15 @@ function inlineTerms(text) {
     (m, en) => `（<button class="term" data-say="${esc(en)}">${esc(en)}</button>）`);
 }
 
-function renderLesson() {
+function renderLessonDetail() {
   const L = (DATA.lessons || []);
-  if (!L.length) { view.innerHTML = '<div class="empty">还没有预习内容</div>'; return; }
-  if (lesId == null) return renderLessonList(L);
-
   const les = L.find(x => x.id === lesId) || L[0];
   const r = lrec(les.id);
   const words = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);
   const done = words.filter(isMastered).length;
 
   view.innerHTML = `
-  <button class="btn line" id="lesBack" style="margin-top:4px">← 全部预习</button>
+  <button class="btn line" id="lesBack" style="margin-top:4px">← 返回学习</button>
 
   <div class="card panel lhero">
     <div class="ltag">第 ${les.id} 节 · 建议 ${les.mins} 分钟</div>
@@ -1103,8 +1102,11 @@ function renderLesson() {
   };
 }
 
-function renderLessonList(L) {
-  view.innerHTML = `<div class="sec-t">课前预习 · ${L.length} 节</div>` +
+/* 首页里的「课前预习」一段 */
+function lessonSectionHTML() {
+  const L = (DATA.lessons || []);
+  if (!L.length) return '';
+  return `<div class="sec-t">课前预习 · ${L.length} 节</div>` +
     L.map(les => {
       const ws = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);
       const d = ws.filter(isMastered).length;
@@ -1117,11 +1119,7 @@ function renderLessonList(L) {
         </div>
         <div class="n">${d}/${ws.length}</div>
       </button>`;
-    }).join('') +
-    `<div class="credit">词汇与主词库互通，进度不分家</div>`;
-  view.querySelectorAll('[data-les]').forEach(b => b.onclick = () => {
-    lesId = +b.dataset.les; view.scrollTop = 0; render();
-  });
+    }).join('');
 }
 
 /* ---------- 句型 ---------- */
