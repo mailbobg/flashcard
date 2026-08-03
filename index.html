@@ -534,8 +534,12 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
   font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);line-height:1.5;
   color:var(--color-text-primary);
 }
-.rs-say{padding:3px 8px;margin-left:7px;vertical-align:middle;background:var(--color-background-muted)}
-.rs-say svg{width:13px;height:13px}
+.rs-btns{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.rs-btns .btn{padding:6px 11px;background:var(--color-background-muted)}
+.rslow{margin-bottom:var(--spacing-4)}
+/* 整段慢读时高亮当前句 */
+.rs{border-radius:var(--radius-element);transition:background var(--duration-fast) var(--ease-standard)}
+.rs.hi{background:var(--color-background-blue);box-shadow:0 0 0 8px var(--color-background-blue)}
 .rs-parts{margin-top:10px}
 /* 中英上下排：中文块可能很长，横排会把英文挤成一字一行 */
 .pr{padding:6px 0}
@@ -1117,15 +1121,20 @@ function renderLessonDetail() {
     <div class="rt"><span class="rn">${i + 1}</span>${esc(t)}<span class="rmore">英文表达 ▾</span></div>
     <p>${ss.map(x => inlineTerms(x.zh)).join('')}</p>
     <div class="ranly">
+      <button class="btn line blk rslow" data-seq="${i}">${IC.slow} 整段慢读（${ss.length} 句连读）</button>
       ${ss.map(x => `<div class="rs">
-        <div class="rs-en">${esc(x.en)}<button class="btn tiny rs-say" data-say="${esc(x.en)}">${IC.spk}</button></div>
+        <div class="rs-en">${esc(x.en)}</div>
+        <div class="rs-btns">
+          <button class="btn tiny" data-say="${esc(x.en)}">${IC.spk} 朗读</button>
+          <button class="btn tiny" data-say="${esc(x.en)}" data-slow="1">${IC.slow} 慢读</button>
+        </div>
         <div class="rs-parts">${x.parts.map(([zh, en, r]) =>
           `<div class="pr"><span class="pz">${esc(zh)}</span><span class="pe ${r || 'x'}">${esc(en)}</span></div>`).join('')}</div>
         <div class="rs-note">${esc(x.note)}</div>
       </div>`).join('')}
     </div>
   </div>`).join('')}
-  <div class="tiny muted" style="margin:-2px 2px 0">点整块看英文表达与拆解，括号里的英文可点朗读</div>
+  <div class="tiny muted" style="margin:-2px 2px 0">点整块看英文表达与拆解 · 每句可朗读或慢读 · 括号里的英文也能点</div>
 
   <div class="sec-t">上课前自查</div>
   <div class="card setgrp">
@@ -1137,8 +1146,21 @@ function renderLessonDetail() {
   $('lesBack').onclick = () => { lesId = null; view.scrollTop = 0; render(); };
   $('lesGo').onclick = () => startStudy(words.slice(), `第 ${les.id} 节`);
   view.onclick = e => {
+    const seq = e.target.closest('[data-seq]');
+    if (seq) {                                   // 整段慢读：逐句连读，读到哪句高亮哪句
+      e.stopPropagation();
+      const blk = seq.closest('.read');
+      blk.classList.add('on');
+      const ss = les.reading[+seq.dataset.seq][1];
+      const els = [...blk.querySelectorAll('.rs')];
+      sayList(ss.map((x, k) => ({
+        text: x.en, rate: SLOW + .05, gap: 420,
+        on: () => els[k]?.classList.add('hi'), off: () => els[k]?.classList.remove('hi')
+      })));
+      return;
+    }
     const sp = e.target.closest('[data-say]');
-    if (sp) { e.stopPropagation(); say(sp.dataset.say); return; }
+    if (sp) { e.stopPropagation(); say(sp.dataset.say, sp.dataset.slow ? SLOW + .05 : undefined); return; }
     const ck = e.target.closest('.chkrow');
     if (ck) {
       const a = lrec(les.id)[ck.dataset.k], i = +ck.dataset.i;
