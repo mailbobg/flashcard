@@ -517,6 +517,42 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 }
 .read p{font-size:var(--font-size-base);line-height:1.9;color:var(--color-text-primary);margin-top:10px}
 .read p + p{margin-top:7px}
+/* 阅读块展开后的中英对照 */
+.read{transition:background var(--duration-fast) var(--ease-standard)}
+.rmore{
+  margin-left:auto;font-size:var(--font-size-xs);font-weight:var(--font-weight-medium);
+  color:var(--color-text-secondary);background:var(--color-accent-muted);
+  border-radius:var(--radius-full);padding:3px 9px;flex:0 0 auto;
+}
+.read.on .rmore{background:var(--color-accent);color:var(--color-on-accent)}
+.ranly{display:none;margin-top:var(--spacing-3);padding-top:var(--spacing-3);
+  border-top:var(--border-width) solid var(--color-border-emphasized)}
+.read.on .ranly{display:block}
+.rs + .rs{margin-top:var(--spacing-4);padding-top:var(--spacing-4);
+  border-top:var(--border-width) dashed var(--color-border-emphasized)}
+.rs-en{
+  font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);line-height:1.5;
+  color:var(--color-text-primary);
+}
+.rs-say{padding:3px 8px;margin-left:7px;vertical-align:middle;background:var(--color-background-muted)}
+.rs-say svg{width:13px;height:13px}
+.rs-parts{margin-top:10px}
+.pr{display:flex;align-items:baseline;gap:7px;padding:4px 0;flex-wrap:wrap}
+.pz{font-size:var(--font-size-sm);color:var(--color-text-secondary);flex:0 0 auto}
+.pa{color:var(--color-text-disabled);font-size:var(--font-size-sm)}
+.pe{font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);flex:1;min-width:0}
+.pe.v{color:var(--color-text-blue)}
+.pe.s{color:var(--color-text-green)}
+.pe.h{color:var(--color-text-red)}
+.pe.d{color:var(--color-text-yellow)}
+.pe.a{color:var(--color-text-purple)}
+.pe.c{color:var(--color-text-cyan)}
+.pe.x{color:var(--color-text-primary)}
+.rs-note{
+  font-size:var(--font-size-xs);color:var(--color-text-secondary);line-height:1.75;
+  margin-top:9px;background:var(--color-background-muted);
+  border-radius:var(--radius-inner);padding:9px 11px;
+}
 .term{
   background:var(--color-background-blue);color:var(--color-text-blue);border:0;
   border-radius:var(--radius-inner);padding:1px 6px;font-family:inherit;
@@ -1072,11 +1108,20 @@ function renderLessonDetail() {
   </div>
 
   <div class="sec-t">阅读材料</div>
-  ${les.reading.map(([t, ps], i) => `<div class="card read">
-    <div class="rt"><span class="rn">${i + 1}</span>${esc(t)}</div>
-    ${ps.map(x => `<p>${inlineTerms(x)}</p>`).join('')}
+  ${les.reading.map(([t, ss], i) => `<div class="card read" data-r="${i}">
+    <div class="rt"><span class="rn">${i + 1}</span>${esc(t)}<span class="rmore">英文表达 ▾</span></div>
+    <p>${ss.map(x => inlineTerms(x.zh)).join('')}</p>
+    <div class="ranly">
+      ${ss.map(x => `<div class="rs">
+        <div class="rs-en">${esc(x.en)}<button class="btn tiny rs-say" data-say="${esc(x.en)}">${IC.spk}</button></div>
+        <div class="rs-parts">${x.parts.map(([zh, en, r]) =>
+          `<div class="pr"><span class="pz">${esc(zh)}</span><span class="pa">→</span>
+           <span class="pe ${r || 'x'}">${esc(en)}</span></div>`).join('')}</div>
+        <div class="rs-note">${esc(x.note)}</div>
+      </div>`).join('')}
+    </div>
   </div>`).join('')}
-  <div class="tiny muted" style="margin:-2px 2px 0">括号里的英文可以点着听</div>
+  <div class="tiny muted" style="margin:-2px 2px 0">点整块看英文表达与拆解，括号里的英文可点朗读</div>
 
   <div class="sec-t">上课前自查</div>
   <div class="card setgrp">
@@ -1098,7 +1143,9 @@ function renderLessonDetail() {
       return;
     }
     const row = e.target.closest('.row');
-    if (row) startStudy([BY_W[row.dataset.w]], `第 ${les.id} 节`);
+    if (row) { startStudy([BY_W[row.dataset.w]], `第 ${les.id} 节`); return; }
+    const rd = e.target.closest('.read');
+    if (rd) rd.classList.toggle('on');
   };
 }
 
