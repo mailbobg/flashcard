@@ -224,6 +224,58 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .bar i{display:block;height:100%;background:var(--color-accent);border-radius:var(--radius-full)}
 .chap .n{flex:0 0 auto;font-size:var(--font-size-sm);color:var(--color-text-secondary);font-variant-numeric:tabular-nums}
 
+/* ---------- 科目切换 ---------- */
+.bookbar{
+  display:flex;gap:4px;padding:4px;margin-top:4px;
+  background:var(--color-background-muted);border-radius:var(--radius-full);
+}
+.bookbar button{
+  flex:1;border:0;background:none;font-family:inherit;color:var(--color-text-secondary);
+  font-size:var(--font-size-base);font-weight:var(--font-weight-medium);
+  padding:8px 0;border-radius:var(--radius-full);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:background var(--duration-fast) var(--ease-standard);
+}
+.bookbar button.on{
+  background:var(--color-background-card);color:var(--color-text-primary);
+  font-weight:var(--font-weight-semibold);box-shadow:var(--shadow-low);
+}
+.bookbar .due{
+  display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;
+  padding:0 5px;border-radius:var(--radius-full);background:var(--color-error);
+  color:#fff;font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- 章节网格 ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-2)}
+.gcard{
+  padding:var(--spacing-3);text-align:left;color:inherit;font-family:inherit;
+  display:flex;flex-direction:column;min-height:104px;overflow:hidden;
+  transition:transform var(--duration-fast) var(--ease-standard);
+}
+.gcard:active{transform:scale(.97)}
+.gcard .no{
+  flex:0 0 auto;width:22px;height:22px;border-radius:var(--radius-inner);
+  background:var(--color-accent);color:var(--color-on-accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);
+}
+.gcard .t{
+  font-weight:var(--font-weight-semibold);font-size:var(--font-size-base);
+  line-height:1.25;margin-top:9px;
+}
+.gcard .e{
+  font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.gcard .n{
+  margin-top:auto;padding-top:6px;font-size:var(--font-size-sm);
+  color:var(--color-text-secondary);font-variant-numeric:tabular-nums;
+}
+/* 细条不做满宽——满宽会在卡片圆角处切出方角 */
+.gcard .bar{height:3px;margin-top:7px}
+
 /* ---------- 学习卡 ---------- */
 #study{position:fixed;inset:0;background:var(--color-background-body);z-index:50;display:none;flex-direction:column}
 #study.on{display:flex}
@@ -976,16 +1028,35 @@ $('tabs').onclick = e => {
 const lessonWordId = (les, w) => w.includes(':') ? w : `${les.book}:${w}`;
 const lessonWords = les => les.vocab.map(([w]) => BY_ID[lessonWordId(les, w)]).filter(Boolean);
 
+/* ---------- 科目切换（学习 / 词表 / 句型 三页共用） ---------- */
+function bookBarHTML() {
+  return `<div class="bookbar">` + DATA.books.map(bk => {
+    const on = bk.id === S.set.book ? ' on' : '';
+    const d = bk.id === S.set.book ? 0 : dueCount(bk.id);
+    return `<button class="bk${on}" data-bk="${bk.id}">${esc(bk.cn)}${
+      d ? `<span class="due">${d}</span>` : ''}</button>`;
+  }).join('') + `</div>`;
+}
+function switchBook(id) {
+  if (!BOOKS[id] || id === S.set.book) return;
+  S.set.book = id; save(); view.scrollTop = 0; render();
+}
+function bindBookBar() {
+  view.querySelectorAll('.bk').forEach(b => b.onclick = () => switchBook(b.dataset.bk));
+}
+
 /* ---------- 首页 ---------- */
 function renderHome() {
-  const W = curWords();
+  const bk = curBook(), W = bk.words;
   const done = W.filter(isMastered).length;
   const due = W.filter(isDue).length;
   const started = W.filter(w => !isNew(w)).length;
   const pct = Math.round(done / W.length * 100);
-  const C = 2 * Math.PI * 34;
+  const C = 2 * Math.PI * 35;
   view.innerHTML = `
-  <div class="card panel dash">
+  ${bookBarHTML()}
+
+  <div class="card panel dash" style="margin-top:12px">
     <div class="ring">
       <svg width="86" height="86">
         <circle class="track" cx="43" cy="43" r="35" fill="none" stroke-width="7"/>
@@ -1011,21 +1082,20 @@ function renderHome() {
 
   ${lessonSectionHTML()}
 
-  <div class="sec-t">按主题学习</div>
-  ${curBook().sections.map(s => {
+  <div class="sec-t">按主题学习 · ${bk.sections.length} 章 / ${W.length} 词</div>
+  <div class="grid">${bk.sections.map(s => {
     const d = s.words.filter(isMastered).length;
-    return `<button class="card chap" data-sec="${s.id}">
+    return `<button class="card gcard" data-sec="${s.id}">
       <div class="no">${s.id}</div>
-      <div class="bd">
-        <div class="t">${esc(s.cn)}</div>
-        <div class="e">${esc(s.en)}</div>
-        <div class="bar"><i style="width:${d / s.words.length * 100}%"></i></div>
-      </div>
+      <div class="t">${esc(s.cn)}</div>
+      <div class="e">${esc(s.en)}</div>
       <div class="n">${d}/${s.words.length}</div>
+      <div class="bar"><i style="width:${d / s.words.length * 100}%"></i></div>
     </button>`;
-  }).join('')}
-  <div class="credit">词表来源：IGCSE 自然科学英语核心词汇表</div>`;
+  }).join('')}</div>
+  <div class="credit">词表来源：${esc(bk.credit)}</div>`;
 
+  bindBookBar();
   $('goDue').onclick = () => {
     const q = W.filter(isDue).sort((a, b) => S.prog[a.id].due - S.prog[b.id].due);
     startStudy(q.length ? q : shuffle(W.filter(isNew)).slice(0, 20), '今日复习');
@@ -1038,7 +1108,7 @@ function renderHome() {
   };
   $('goAll').onclick = () => startStudy(shuffle(W.slice()), '全部乱序');
   view.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => {
-    const s = curBook().sections.find(x => x.id == b.dataset.sec);
+    const s = bk.sections.find(x => x.id == b.dataset.sec);
     startStudy(s.words.slice(), s.cn);
   });
   view.querySelectorAll('[data-les]').forEach(b => b.onclick = () => {
@@ -1199,9 +1269,9 @@ function renderLessonDetail() {
   };
 }
 
-/* 首页里的「课前预习」一段 */
+/* 首页里的「课前预习」一段，只显示属于当前书的课时 */
 function lessonSectionHTML() {
-  const L = (DATA.lessons || []);
+  const L = (DATA.lessons || []).filter(l => l.book === S.set.book);
   if (!L.length) return '';
   return `<div class="sec-t">课前预习 · ${L.length} 节</div>` +
     L.map(les => {
