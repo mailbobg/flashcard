@@ -602,9 +602,9 @@ EOF
   可写成 `"sci:diffusion"`（带前缀跨书引用）或 `"pressure"`（不带前缀＝本课所属书）
 
 **背景：** 衔接课程有两门（化学、物理）。第 3 节「扩散、布朗运动与气体规律」属于**物理**那门。
-它的 12 个词横跨两本：`pressure` / `volume` / `kinetic energy` / `temperature` 在物理书里
-（例句是物理语境，更对路），`diffusion` / `Brownian motion` / `concentration` / `collision` /
-`random` / `net movement` / `relative molecular mass` 只在科学书里。
+它的 12 个词横跨两本。**这 12 个词是课程内容，一个都不能增删改。**
+只有 `kinetic energy` / `pressure` / `volume` 这三词在物理书里也有（例句是物理语境，更对路），
+用不带前缀的写法；其余 9 词只在科学书里，写成 `sci:` 前缀跨书引用。
 
 - [ ] **Step 1: 先加校验，让构建失败**
 
@@ -707,13 +707,13 @@ les = LESSONS[0]
 assert les['book'] == 'phy', les['book']
 ids = [v[0] if ':' in v[0] else les['book']+':'+v[0] for v in les['vocab']]
 assert all(i in have for i in ids), [i for i in ids if i not in have]
-assert sum(1 for i in ids if i.startswith('sci:')) == 7, ids
-assert sum(1 for i in ids if i.startswith('phy:')) == 5, ids
-print('OK 跨书 7 + 本书 5')
+assert sum(1 for i in ids if i.startswith('sci:')) == 9, ids
+assert sum(1 for i in ids if i.startswith('phy:')) == 3, ids
+print('OK 跨书 9 + 本书 3')
 "
 ```
 
-Expected: `OK 跨书 7 + 本书 5`
+Expected: `OK 跨书 9 + 本书 3`
 
 - [ ] **Step 7: 提交**
 

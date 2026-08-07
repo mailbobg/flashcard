@@ -219,11 +219,11 @@ PDF 内 `temperature` 与 `current` 各出现两次。保留定义性更强的�
 
 第 3 节「扩散、布朗运动与气体规律」属于物理课，但它的 12 个词横跨两本：
 
-- `pressure`、`volume`、`kinetic energy`、`temperature` 等 5 词用物理书自己的
-  词条，例句是物理语境
-- `diffusion`、`Brownian motion`、`concentration`、`collision`、`random`、
-  `net movement`、`relative molecular mass` 7 词只在科学书里，写成
-  `"sci:diffusion"` 跨书引用
+- `kinetic energy`、`pressure`、`volume` 3 词物理书里也有，用物理书自己的词条，
+  例句是物理语境
+- 其余 9 词（`diffusion`、`Brownian motion`、`random`、`concentration`、
+  `high concentration`、`low concentration`、`net movement`、`collision`、
+  `relative molecular mass`）只在科学书里，写成 `"sci:diffusion"` 跨书引用
 
 跨书引用的词进度记在其所属书（`sci:diffusion`），因此不计入物理书的进度环，
 但预习卡自己的 `d/12` 完成度照实统计。这是预期行为：那些词本来就属于科学书。
