@@ -224,6 +224,11 @@ EOF
 
 ## Task 2: 构建链路改成两本书
 
+> **产物的过渡期**：`index.html` 由「数据 + 模板」合成。本任务换了数据结构，
+> 模板要到 Task 4 才跟上，所以 Task 2、Task 3 提交的 `index.html` **打开是白屏**。
+> 这是拆分任务的必然代价 —— 产物必须跟着源文件走，不能留在工作区不提交。
+> 源文件本身在每个任务结束时都是自洽的。Task 4 结束后产物恢复可用。
+
 **Files:**
 - Modify: `src/build.py`（`build_data` / `enrich` / `check` / `attach_trans` / `__main__`）
 - Create: `src/phon_phy.py`（本任务只建空壳，Task 8 填内容）
@@ -565,7 +570,7 @@ Expected: `OK {'sci': 170, 'phy': 162}`
 - [ ] **Step 10: 提交**
 
 ```bash
-git add src/build.py src/phon_phy.py src/frames_phy.py src/data.json
+git add src/build.py src/phon_phy.py src/frames_phy.py src/data.json index.html
 git commit -m "$(cat <<'EOF'
 feat: 构建链路改成两本词书，词条补稳定 id
 
@@ -708,7 +713,7 @@ Expected: `OK 跨书 7 + 本书 5`
 - [ ] **Step 7: 提交**
 
 ```bash
-git add src/lessons.py src/build.py src/data.json
+git add src/lessons.py src/build.py src/data.json index.html
 git commit -m "$(cat <<'EOF'
 feat: 课时按书归属，vocab 支持跨书引用
 
