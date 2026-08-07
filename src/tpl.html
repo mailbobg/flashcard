@@ -1221,8 +1221,9 @@ function lessonSectionHTML() {
 
 /* ---------- 句型 ---------- */
 function renderFrames() {
-  view.innerHTML = `<div class="sec-t">常用科学英语句型 · ${DATA.frames.length} 组</div>` +
-    DATA.frames.map((f, i) => `<div class="card fr">
+  const bk = curBook();
+  view.innerHTML = `<div class="sec-t">常用科学英语句型 · ${bk.frames.length} 组</div>` +
+    bk.frames.map((f, i) => `<div class="card fr">
       <div class="use">${esc(f.use)}</div>
       <div class="fm">${esc(f.frame)}</div>
       <div class="en">${esc(f.ex)}</div>
@@ -1230,7 +1231,7 @@ function renderFrames() {
       <div style="margin-top:12px"><button class="btn line tiny" data-f="${i}">${IC.spk} 朗读例句</button></div>
     </div>`).join('') +
     `<div class="credit">先模仿句型，再替换关键词造句</div>`;
-  view.onclick = e => { const b = e.target.closest('[data-f]'); if (b) say(DATA.frames[b.dataset.f].ex); };
+  view.onclick = e => { const b = e.target.closest('[data-f]'); if (b) say(bk.frames[b.dataset.f].ex); };
 }
 
 /* ---------- 设置 ---------- */
