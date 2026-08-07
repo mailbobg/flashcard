@@ -1121,32 +1121,41 @@ const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.r
 let q = '';
 function renderList() {
   view.innerHTML = `
-    <div style="display:flex;gap:8px;margin-top:4px">
+    ${bookBarHTML()}
+    <div style="display:flex;gap:8px;margin-top:12px">
       <input class="search" id="q" placeholder="搜索单词或中文…" value="${esc(q)}">
       <button class="btn ${S.set.maskZh ? 'pri' : 'line'}" id="mask" style="flex:0 0 auto">${S.set.maskZh ? '显示' : '遮住'}中文</button>
     </div>
     <div id="rows"></div>`;
+  bindBookBar();
   const rows = $('rows');
   const draw = () => {
     const kw = q.trim().toLowerCase();
+    const hit = w => !kw || w.w.toLowerCase().includes(kw) || w.zh.includes(kw);
+    // 平时只看当前书；一搜就把另一科的命中也带出来，方便对比同名词的两个例句
+    const books = kw ? [curBook(), ...DATA.books.filter(b => b.id !== S.set.book)]
+                     : [curBook()];
     let h = '';
-    curBook().sections.forEach(s => {
-      const ws = s.words.filter(w => !kw || w.w.toLowerCase().includes(kw) || w.zh.includes(kw));
-      if (!ws.length) return;
-      h += `<div class="grp">${s.id}. ${esc(s.cn)} · ${ws.length}</div><div class="card rowgrp">`;
-      ws.forEach(w => {
-        const b = S.prog[w.id]?.box || 0, sn = !isNew(w);
-        const col = !sn ? 'var(--color-track)' : b >= 4 ? 'var(--color-success)' : b >= 2 ? 'var(--color-warning)' : 'var(--color-error)';
-        h += `<div class="row" data-w="${esc(w.id)}">
-          <span class="dot" style="background:${col}"></span>
-          <div class="bd">
-            <span class="w">${esc(w.w)}</span><span class="p">${esc(w.ipa)}</span>
-            <div class="z${S.set.maskZh ? ' hide' : ''}">${esc(w.zh)}</div>
-          </div>
-          <span class="iconbtn" data-say="${esc(w.w)}">${IC.spk}</span>
-        </div>`;
+    books.forEach((bk, bi) => {
+      bk.sections.forEach(s => {
+        const ws = s.words.filter(hit);
+        if (!ws.length) return;
+        const head = bi ? `${esc(bk.cn)} · ${esc(s.cn)}` : `${s.id}. ${esc(s.cn)}`;
+        h += `<div class="grp">${head} · ${ws.length}</div><div class="card rowgrp">`;
+        ws.forEach(w => {
+          const b = S.prog[w.id]?.box || 0, sn = !isNew(w);
+          const col = !sn ? 'var(--color-track)' : b >= 4 ? 'var(--color-success)' : b >= 2 ? 'var(--color-warning)' : 'var(--color-error)';
+          h += `<div class="row" data-w="${esc(w.id)}">
+            <span class="dot" style="background:${col}"></span>
+            <div class="bd">
+              <span class="w">${esc(w.w)}</span><span class="p">${esc(w.ipa)}</span>
+              <div class="z${S.set.maskZh ? ' hide' : ''}">${esc(w.zh)}</div>
+            </div>
+            <span class="iconbtn" data-say="${esc(w.w)}">${IC.spk}</span>
+          </div>`;
+        });
+        h += '</div>';
       });
-      h += '</div>';
     });
     rows.innerHTML = h || '<div class="empty">没有匹配的词</div>';
   };
@@ -1292,7 +1301,8 @@ function lessonSectionHTML() {
 /* ---------- 句型 ---------- */
 function renderFrames() {
   const bk = curBook();
-  view.innerHTML = `<div class="sec-t">常用科学英语句型 · ${bk.frames.length} 组</div>` +
+  view.innerHTML = bookBarHTML() +
+    `<div class="sec-t">常用科学英语句型 · ${bk.frames.length} 组</div>` +
     bk.frames.map((f, i) => `<div class="card fr">
       <div class="use">${esc(f.use)}</div>
       <div class="fm">${esc(f.frame)}</div>
@@ -1301,6 +1311,7 @@ function renderFrames() {
       <div style="margin-top:12px"><button class="btn line tiny" data-f="${i}">${IC.spk} 朗读例句</button></div>
     </div>`).join('') +
     `<div class="credit">先模仿句型，再替换关键词造句</div>`;
+  bindBookBar();
   view.onclick = e => { const b = e.target.closest('[data-f]'); if (b) say(bk.frames[b.dataset.f].ex); };
 }
 
@@ -1345,7 +1356,7 @@ function renderMe() {
       <u>${n}</u></div>`).join('')}
     <div class="tiny muted" style="margin-top:10px">间隔：即时 · 10 分钟 · 1 天 · 3 天 · 7 天 · 21 天</div>
   </div>
-  <button class="btn line blk" id="reset" style="margin-top:10px;color:var(--color-error)">清空学习进度</button>
+  <button class="btn line blk" id="reset" style="margin-top:10px;color:var(--color-error)">清空全部学习进度（两科）</button>
   <div class="credit">数据保存在本机浏览器，离线可用</div>`;
 
   $('theme').onchange = e => { S.set.theme = e.target.value; save(); applyTheme(); };
@@ -1357,7 +1368,7 @@ function renderMe() {
     const w = BY_ID['sci:photosynthesis'];
     sayList([...flatSyl(w).map(sy => ({ text: sylText(sy), rate: SLOW, gap: 220 })), { text: w.w, rate: S.set.rate }]);
   };
-  $('reset').onclick = () => { if (confirm('确定清空所有学习进度？')) { S.prog = {}; save(); render(); toast('已清空'); } };
+  $('reset').onclick = () => { if (confirm('确定清空两本词书的全部学习进度？')) { S.prog = {}; save(); render(); toast('已清空'); } };
 }
 
 /* ===================== 卡片学习 ===================== */
