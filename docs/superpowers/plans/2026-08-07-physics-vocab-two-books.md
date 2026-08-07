@@ -844,7 +844,58 @@ const dueCount = b => BOOKS[b].words.filter(isDue).length;
 $('hdS').textContent = `${Object.values(BOOKS).reduce((n, b) => n + b.words.length, 0)} 词 · 音标 · 拆音节 · 朗读`;
 ```
 
-- [ ] **Step 6: 构建并在浏览器里验证迁移**
+- [ ] **Step 6: 把剩余的 `ALL` / `BY_W` 引用机械替换掉**
+
+**只换引用，不动任何布局或文案** —— 界面在本任务结束时必须和改动前长得一模一样。
+先加两个解析课时词的辅助函数，放在 `/* ---------- 首页 ---------- */` 注释之前：
+
+```js
+/* vocab 的词可写成 "sci:diffusion" 跨书引用，不带前缀就按本课的 book 解析 */
+const lessonWordId = (les, w) => w.includes(':') ? w : `${les.book}:${w}`;
+const lessonWords = les => les.vocab.map(([w]) => BY_ID[lessonWordId(les, w)]).filter(Boolean);
+```
+
+然后逐处替换：
+
+**`renderHome`（约 957-1015 行）**——在函数第一行加 `const W = curWords();`，
+把函数体里所有 `ALL` 换成 `W`，并把三处进度读取换成 id：
+
+```js
+    const q = W.filter(isDue).sort((a, b) => S.prog[a.id].due - S.prog[b.id].due);
+```
+
+```js
+    const q = W.filter(w => (S.prog[w.id]?.wrong || 0) > 0 || S.prog[w.id]?.star)
+      .sort((a, b) => (S.prog[b.id].wrong || 0) - (S.prog[a.id].wrong || 0));
+```
+
+**`lessonSectionHTML`（约 1184 行）**：`les.vocab.map(([w]) => BY_W[w]).filter(Boolean)`
+→ `lessonWords(les)`。**本任务不加按书过滤**——分段控件要到 Task 5 才有，
+这里过滤会让物理那节课没有入口。
+
+**预习详情页**：`const words = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);`
+→ `const words = lessonWords(les);`；`const it = BY_W[w];`
+→ `const it = BY_ID[lessonWordId(les, w)];`；该页词条行的
+`data-w="${esc(w.w)}"` → `data-w="${esc(w.id)}"`，对应的
+`startStudy([BY_W[row.dataset.w]], …)` → `startStudy([BY_ID[row.dataset.w]], …)`。
+
+**`renderList`（约 1044、1046、1066 行）**：`S.prog[w.w]` → `S.prog[w.id]`；
+`data-w="${esc(w.w)}"` → `data-w="${esc(w.id)}"`；
+`startStudy([BY_W[r.dataset.w]], '单词')` → `startStudy([BY_ID[r.dataset.w]], '单词')`。
+
+**`renderMe`（约 1214、1248、1261 行）**：函数第一行加 `const W = curWords();`，
+`ALL` 全换成 `W`，`S.prog[w.w]` → `S.prog[w.id]`，
+`BY_W['photosynthesis']` → `BY_ID['sci:photosynthesis']`。
+
+替换完用这条确认没有遗漏：
+
+```bash
+grep -n "BY_W\|\bALL\b" src/tpl.html
+```
+
+Expected: 无输出。
+
+- [ ] **Step 7: 构建并在浏览器里验证迁移**
 
 ```bash
 python3 src/build.py
@@ -883,18 +934,30 @@ Expected: `migrated: true`、`box: 3`、`book: "sci"`、`total: 332`、`byId: tr
 
 再执行一次 `location.reload()` 后重跑上面的断言，确认**幂等**（第二次不会再动数据）。
 
-- [ ] **Step 7: 提交**
+再确认界面没被这次重构改坏 —— 本任务不应有任何肉眼可见的变化：
 
-此时首页等界面还引用着已删除的 `ALL` / `BY_W`，页面会报错 —— 这是预期的，
-Task 5 收尾。**先提交，保持每步可回溯。**
+```js
+JSON.stringify({
+  chap: document.querySelectorAll('.chap').length,        // 章节卡 + 预习卡
+  err: (() => { try { renderList(); renderMe(); renderHome(); return null } catch (e) { return e.message } })(),
+  study: (() => { document.querySelector('[data-sec]').click();
+                  const on = document.getElementById('study').classList.contains('on');
+                  document.getElementById('stClose').click(); return on })()
+})
+```
+
+Expected: `chap: 10`（9 章 + 1 节预习）、`err: null`、`study: true`。
+浏览器控制台（`read_console_messages`）应无报错。
+
+- [ ] **Step 8: 提交**
 
 ```bash
 git add src/tpl.html index.html
 git commit -m "$(cat <<'EOF'
 refactor: 进度改按 <book>:<word> 存，旧数据一次性迁移
 
-BY_W 换成跨书的 BY_ID，ALL 换成 curWords()。裸词 key 全部归到科学书，
-迁移幂等。界面层引用待下一步收敛。
+BY_W 换成跨书的 BY_ID，ALL 换成 curWords()，课时词统一走 lessonWordId 解析。
+裸词 key 全部归到科学书，迁移幂等。界面外观不变。
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
 EOF
@@ -1096,32 +1159,12 @@ function lessonSectionHTML() {
       </button>`;
     }).join('');
 }
-/* vocab 的词可写成 "sci:diffusion" 跨书引用，不带前缀就按本课的 book 解析 */
-const lessonWordId = (les, w) => w.includes(':') ? w : `${les.book}:${w}`;
-const lessonWords = les => les.vocab.map(([w]) => BY_ID[lessonWordId(les, w)]).filter(Boolean);
 ```
 
-- [ ] **Step 5: 修掉预习详情页里的 BY_W 引用**
+本任务对这个函数**只加第一行的 `.filter(l => l.book === S.set.book)`** ——
+`lessonWords` / `lessonWordId` 已在 Task 4 建好，不要重复定义。
 
-`tpl.html` 里还有三处（约 1083、1106、1172、1184 行）用 `BY_W[w]`。全部改成
-经 `lessonWordId` 解析：
-
-- `const words = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);` → `const words = lessonWords(les);`
-- `const it = BY_W[w];` → `const it = BY_ID[lessonWordId(les, w)];`
-- `if (row) { startStudy([BY_W[row.dataset.w]], …) }` → `if (row) { startStudy([BY_ID[row.dataset.w]], …) }`，
-  同时把生成该行时写入的 `data-w="${esc(w.w)}"` 改成 `data-w="${esc(w.id)}"`
-- `const ws = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);` → `const ws = lessonWords(les);`
-
-用这条命令确认没有遗漏：
-
-```bash
-grep -n "BY_W\|\bALL\b" src/tpl.html
-```
-
-Expected: 无输出。有输出就逐个改掉（`ALL` 全部换成 `curWords()`，含 `renderMe` 的
-两处和 `renderList`）。
-
-- [ ] **Step 6: 构建并验证**
+- [ ] **Step 5: 构建并验证**
 
 ```bash
 python3 src/build.py
@@ -1162,12 +1205,12 @@ JSON.stringify({
 Expected: `cards: 11`、`lesson: true`（预习归物理）、
 `credit` 含「Cambridge IGCSE Physics 0625」、`screens ≤ 2.5`
 
-- [ ] **Step 7: 出图存档**
+- [ ] **Step 6: 出图存档**
 
 `resize_window {preset: "mobile"}` 后 `computer {action: "screenshot"}`，
 浅色/深色各一张，确认细条与红点角标对比度正常。
 
-- [ ] **Step 8: 提交**
+- [ ] **Step 7: 提交**
 
 ```bash
 git add src/tpl.html index.html
