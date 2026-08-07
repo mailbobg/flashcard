@@ -1502,6 +1502,19 @@ cw.addEventListener('touchend', e => {
   else if (dx > 0 && qi > 0) { qi--; drawCard(); }
 }, { passive: true });
 
+/* 学习 / 词表 / 句型 三页左右滑动切换科目。判定与卡片页保持一致 */
+let vx = 0, vy = 0;
+view.addEventListener('touchstart', e => {
+  vx = e.touches[0].clientX; vy = e.touches[0].clientY;
+}, { passive: true });
+view.addEventListener('touchend', e => {
+  if (curView === 'me' || lesId != null) return;      // 设置页与预习详情页不参与
+  const dx = e.changedTouches[0].clientX - vx, dy = e.changedTouches[0].clientY - vy;
+  if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+  const i = BOOK_IDS.indexOf(S.set.book) + (dx < 0 ? 1 : -1);
+  if (i >= 0 && i < BOOK_IDS.length) switchBook(BOOK_IDS[i]);   // 到头不循环
+}, { passive: true });
+
 /* ===================== 杂项 ===================== */
 let tt;
 function toast(m) {
