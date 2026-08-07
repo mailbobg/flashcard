@@ -656,29 +656,47 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 const DATA = __DATA__;
 
 /* ===================== 数据索引 ===================== */
-const ALL = [];
-DATA.sections.forEach(s => s.words.forEach(w => {
-  w.sec = s.id; w.secName = s.cn; ALL.push(w);
-}));
-const BY_W = Object.fromEntries(ALL.map(w => [w.w, w]));
+const BOOKS = {};
+DATA.books.forEach(bk => {
+  bk.words = [];
+  bk.sections.forEach(s => s.words.forEach(w => {
+    w.book = bk.id; w.sec = s.id; w.secName = s.cn; bk.words.push(w);
+  }));
+  BOOKS[bk.id] = bk;
+});
+const BOOK_IDS = DATA.books.map(b => b.id);
+const BY_ID = Object.fromEntries(
+  DATA.books.flatMap(bk => bk.words.map(w => [w.id, w])));
+const curBook = () => BOOKS[S.set.book] || BOOKS[BOOK_IDS[0]];
+const curWords = () => curBook().words;
 
 /* ===================== 存储 ===================== */
 const KEY = 'igcse-flashcard-v1';
 const DEF = {
-  prog: {},                       // word -> {box, due, seen, wrong, star}
+  prog: {},                       // id(<book>:<word>) -> {box, due, seen, wrong, star}
   les: {},                        // 课时 id -> {goals:[], check:[]} 勾选状态
-  set: { rate: .95, voice: '', autoSpeak: true, sylMode: 'respell', maskZh: false, theme: 'light' }
+  set: { rate: .95, voice: '', autoSpeak: true, sylMode: 'respell', maskZh: false, theme: 'light', book: 'sci' }
 };
 let S = load();
 function load() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) || '{}');
-    return { prog: raw.prog || {}, les: raw.les || {}, set: Object.assign({}, DEF.set, raw.set || {}) };
+    const S = { prog: raw.prog || {}, les: raw.les || {},
+                set: Object.assign({}, DEF.set, raw.set || {}) };
+    // 旧版进度按裸词存，两本词书上线后改按 <book>:<word>。裸 key 一律归到科学书。
+    let moved = 0;
+    for (const k of Object.keys(S.prog)) {
+      if (k.includes(':')) continue;
+      S.prog['sci:' + k] = S.prog[k]; delete S.prog[k]; moved++;
+    }
+    if (moved) { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+    if (!BOOKS[S.set.book]) S.set.book = BOOK_IDS[0];
+    return S;
   } catch (e) { return JSON.parse(JSON.stringify(DEF)); }
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 function lrec(id) { return S.les[id] || (S.les[id] = { goals: [], check: [] }); }
-function rec(w) { return S.prog[w] || (S.prog[w] = { box: 0, due: 0, seen: 0, wrong: 0, star: 0 }); }
+function rec(id) { return S.prog[id] || (S.prog[id] = { box: 0, due: 0, seen: 0, wrong: 0, star: 0 }); }
 function applyTheme() {
   const dark = S.set.theme === 'dark';
   document.documentElement.classList.toggle('dark', dark);   // :root.dark → color-scheme:dark → light-dark() 全量切换
@@ -695,17 +713,18 @@ applyTheme();
 
 /* 间隔重复：盒子 0..5 对应的下次复习间隔 */
 const STEP = [0, 10 * 60e3, 24 * 3600e3, 3 * 24 * 3600e3, 7 * 24 * 3600e3, 21 * 24 * 3600e3];
-function grade(word, g) {
-  const r = rec(word); r.seen++;
+function grade(id, g) {
+  const r = rec(id); r.seen++;
   if (g === 0) { r.box = 0; r.wrong++; }
   else if (g === 1) { r.box = Math.min(Math.max(r.box, 1), 3); }   // 模糊：至少 10 分钟后再来
   else { r.box = Math.min(5, r.box + 1); }
   r.due = Date.now() + STEP[r.box];
   save();
 }
-const isDue = w => { const r = S.prog[w.w]; return r && r.seen > 0 && r.due <= Date.now(); };
-const isNew = w => !S.prog[w.w] || !S.prog[w.w].seen;
-const isMastered = w => (S.prog[w.w]?.box || 0) >= 4;
+const isDue = w => { const r = S.prog[w.id]; return r && r.seen > 0 && r.due <= Date.now(); };
+const isNew = w => !S.prog[w.id] || !S.prog[w.id].seen;
+const isMastered = w => (S.prog[w.id]?.box || 0) >= 4;
+const dueCount = b => BOOKS[b].words.filter(isDue).length;
 
 /* ===================== 朗读 ===================== */
 let VOICES = [], booted = false;
@@ -953,12 +972,17 @@ $('tabs').onclick = e => {
   view.scrollTop = 0; render();
 };
 
+/* vocab 的词可写成 "sci:diffusion" 跨书引用，不带前缀就按本课的 book 解析 */
+const lessonWordId = (les, w) => w.includes(':') ? w : `${les.book}:${w}`;
+const lessonWords = les => les.vocab.map(([w]) => BY_ID[lessonWordId(les, w)]).filter(Boolean);
+
 /* ---------- 首页 ---------- */
 function renderHome() {
-  const done = ALL.filter(isMastered).length;
-  const due = ALL.filter(isDue).length;
-  const started = ALL.filter(w => !isNew(w)).length;
-  const pct = Math.round(done / ALL.length * 100);
+  const W = curWords();
+  const done = W.filter(isMastered).length;
+  const due = W.filter(isDue).length;
+  const started = W.filter(w => !isNew(w)).length;
+  const pct = Math.round(done / W.length * 100);
   const C = 2 * Math.PI * 34;
   view.innerHTML = `
   <div class="card panel dash">
@@ -966,14 +990,14 @@ function renderHome() {
       <svg width="86" height="86">
         <circle class="track" cx="43" cy="43" r="35" fill="none" stroke-width="7"/>
         ${done ? `<circle cx="43" cy="43" r="35" fill="none" stroke="var(--color-accent)" stroke-width="7" stroke-linecap="round"
-          stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - done / ALL.length)}"/>` : ''}
+          stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - done / W.length)}"/>` : ''}
       </svg>
       <div class="num"><b>${pct}%</b><span>已掌握</span></div>
     </div>
     <div class="stat">
       <div><i style="background:var(--color-success)"></i><b>${done}</b><span>已掌握</span></div>
       <div><i style="background:var(--color-warning)"></i><b>${started - done}</b><span>学习中</span></div>
-      <div><i style="background:var(--color-track)"></i><b>${ALL.length - started}</b><span>未学习</span></div>
+      <div><i style="background:var(--color-track)"></i><b>${W.length - started}</b><span>未学习</span></div>
     </div>
   </div>
 
@@ -988,7 +1012,7 @@ function renderHome() {
   ${lessonSectionHTML()}
 
   <div class="sec-t">按主题学习</div>
-  ${DATA.sections.map(s => {
+  ${curBook().sections.map(s => {
     const d = s.words.filter(isMastered).length;
     return `<button class="card chap" data-sec="${s.id}">
       <div class="no">${s.id}</div>
@@ -1003,18 +1027,18 @@ function renderHome() {
   <div class="credit">词表来源：IGCSE 自然科学英语核心词汇表</div>`;
 
   $('goDue').onclick = () => {
-    const q = ALL.filter(isDue).sort((a, b) => S.prog[a.w].due - S.prog[b.w].due);
-    startStudy(q.length ? q : shuffle(ALL.filter(isNew)).slice(0, 20), '今日复习');
+    const q = W.filter(isDue).sort((a, b) => S.prog[a.id].due - S.prog[b.id].due);
+    startStudy(q.length ? q : shuffle(W.filter(isNew)).slice(0, 20), '今日复习');
   };
-  $('goNew').onclick = () => startStudy(ALL.filter(isNew).slice(0, 20), '新词');
+  $('goNew').onclick = () => startStudy(W.filter(isNew).slice(0, 20), '新词');
   $('goHard').onclick = () => {
-    const q = ALL.filter(w => (S.prog[w.w]?.wrong || 0) > 0 || S.prog[w.w]?.star)
-      .sort((a, b) => (S.prog[b.w].wrong || 0) - (S.prog[a.w].wrong || 0));
+    const q = W.filter(w => (S.prog[w.id]?.wrong || 0) > 0 || S.prog[w.id]?.star)
+      .sort((a, b) => (S.prog[b.id].wrong || 0) - (S.prog[a.id].wrong || 0));
     q.length ? startStudy(q, '难词本') : toast('还没有标记的难词');
   };
-  $('goAll').onclick = () => startStudy(shuffle(ALL.slice()), '全部乱序');
+  $('goAll').onclick = () => startStudy(shuffle(W.slice()), '全部乱序');
   view.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => {
-    const s = DATA.sections.find(x => x.id == b.dataset.sec);
+    const s = curBook().sections.find(x => x.id == b.dataset.sec);
     startStudy(s.words.slice(), s.cn);
   });
   view.querySelectorAll('[data-les]').forEach(b => b.onclick = () => {
@@ -1036,14 +1060,14 @@ function renderList() {
   const draw = () => {
     const kw = q.trim().toLowerCase();
     let h = '';
-    DATA.sections.forEach(s => {
+    curBook().sections.forEach(s => {
       const ws = s.words.filter(w => !kw || w.w.toLowerCase().includes(kw) || w.zh.includes(kw));
       if (!ws.length) return;
       h += `<div class="grp">${s.id}. ${esc(s.cn)} · ${ws.length}</div><div class="card rowgrp">`;
       ws.forEach(w => {
-        const b = S.prog[w.w]?.box || 0, sn = !isNew(w);
+        const b = S.prog[w.id]?.box || 0, sn = !isNew(w);
         const col = !sn ? 'var(--color-track)' : b >= 4 ? 'var(--color-success)' : b >= 2 ? 'var(--color-warning)' : 'var(--color-error)';
-        h += `<div class="row" data-w="${esc(w.w)}">
+        h += `<div class="row" data-w="${esc(w.id)}">
           <span class="dot" style="background:${col}"></span>
           <div class="bd">
             <span class="w">${esc(w.w)}</span><span class="p">${esc(w.ipa)}</span>
@@ -1063,7 +1087,7 @@ function renderList() {
     const s = e.target.closest('[data-say]');
     if (s) { e.stopPropagation(); say(s.dataset.say); return; }
     const r = e.target.closest('.row');
-    if (r) startStudy([BY_W[r.dataset.w]], '单词');
+    if (r) startStudy([BY_ID[r.dataset.w]], '单词');
   };
 }
 
@@ -1080,7 +1104,7 @@ function renderLessonDetail() {
   const L = (DATA.lessons || []);
   const les = L.find(x => x.id === lesId) || L[0];
   const r = lrec(les.id);
-  const words = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);
+  const words = lessonWords(les);
   const done = words.filter(isMastered).length;
 
   view.innerHTML = `
@@ -1103,8 +1127,8 @@ function renderLessonDetail() {
   <button class="btn pri blk" id="lesGo">开始学这 ${words.length} 个词${done ? `（已掌握 ${done}）` : ''}</button>
   <div class="card rowgrp" style="margin-top:8px">
     ${les.vocab.map(([w, hint]) => {
-      const it = BY_W[w];
-      return `<div class="row" data-w="${esc(w)}">
+      const it = BY_ID[lessonWordId(les, w)];
+      return `<div class="row" data-w="${esc(it.id)}">
         <span class="dot" style="background:${isNew(it) ? 'var(--color-track)'
           : isMastered(it) ? 'var(--color-success)' : 'var(--color-warning)'}"></span>
         <div class="bd">
@@ -1169,7 +1193,7 @@ function renderLessonDetail() {
       return;
     }
     const row = e.target.closest('.row');
-    if (row) { startStudy([BY_W[row.dataset.w]], `第 ${les.id} 节`); return; }
+    if (row) { startStudy([BY_ID[row.dataset.w]], `第 ${les.id} 节`); return; }
     const rd = e.target.closest('.read');
     if (rd) rd.classList.toggle('on');
   };
@@ -1181,7 +1205,7 @@ function lessonSectionHTML() {
   if (!L.length) return '';
   return `<div class="sec-t">课前预习 · ${L.length} 节</div>` +
     L.map(les => {
-      const ws = les.vocab.map(([w]) => BY_W[w]).filter(Boolean);
+      const ws = lessonWords(les);
       const d = ws.filter(isMastered).length;
       return `<button class="card chap lcard" data-les="${les.id}">
         <div class="no">${les.id}</div>
@@ -1211,7 +1235,8 @@ function renderFrames() {
 
 /* ---------- 设置 ---------- */
 function renderMe() {
-  const boxes = [0, 1, 2, 3, 4, 5].map(b => ALL.filter(w => (S.prog[w.w]?.box || 0) === b && !isNew(w)).length);
+  const W = curWords();
+  const boxes = [0, 1, 2, 3, 4, 5].map(b => W.filter(w => (S.prog[w.id]?.box || 0) === b && !isNew(w)).length);
   view.innerHTML = `
   <div class="sec-t">外观</div>
   <div class="card setgrp">
@@ -1245,7 +1270,7 @@ function renderMe() {
     <div class="tiny muted" style="margin-bottom:12px">记忆盒子（等级越高，复习间隔越长）</div>
     ${boxes.map((n, i) => `<div class="lvrow">
       <em>Lv.${i}</em>
-      <span class="bar" style="flex:1;margin:0"><i style="width:${n / ALL.length * 100}%"></i></span>
+      <span class="bar" style="flex:1;margin:0"><i style="width:${n / W.length * 100}%"></i></span>
       <u>${n}</u></div>`).join('')}
     <div class="tiny muted" style="margin-top:10px">间隔：即时 · 10 分钟 · 1 天 · 3 天 · 7 天 · 21 天</div>
   </div>
@@ -1258,7 +1283,7 @@ function renderMe() {
   $('sylMode').onchange = e => { S.set.sylMode = e.target.value; save(); };
   $('auto').onclick = e => { S.set.autoSpeak = !S.set.autoSpeak; e.currentTarget.classList.toggle('on', S.set.autoSpeak); save(); };
   $('test').onclick = () => {
-    const w = BY_W['photosynthesis'];
+    const w = BY_ID['sci:photosynthesis'];
     sayList([...flatSyl(w).map(sy => ({ text: sylText(sy), rate: SLOW, gap: 220 })), { text: w.w, rate: S.set.rate }]);
   };
   $('reset').onclick = () => { if (confirm('确定清空所有学习进度？')) { S.prog = {}; save(); render(); toast('已清空'); } };
@@ -1274,7 +1299,7 @@ function startStudy(list, name) {
 }
 $('stClose').onclick = () => { stopSpeak(); $('study').classList.remove('on'); render(); };
 $('stStar').onclick = () => {
-  const r = rec(Q[qi].w); r.star = r.star ? 0 : 1; save();
+  const r = rec(Q[qi].id); r.star = r.star ? 0 : 1; save();
   $('stStar').classList.toggle('star-on', !!r.star);
   toast(r.star ? '已加入难词本' : '已移出难词本');
 };
@@ -1285,7 +1310,7 @@ function drawCard(speak) {
   $('card3d').classList.remove('flip');
   $('stPg').textContent = `${qi + 1}/${Q.length}`;
   $('stProg').style.width = (qi / Q.length * 100) + '%';
-  $('stStar').classList.toggle('star-on', !!S.prog[w.w]?.star);
+  $('stStar').classList.toggle('star-on', !!S.prog[w.id]?.star);
 
   const tag = `<span class="sn">${w.sec}</span>${esc(w.secName)}`
     + (qName && qName !== w.secName ? ` · ${esc(qName)}` : '');
@@ -1379,8 +1404,8 @@ function playSeq(w) {
 document.querySelector('.acts').onclick = e => {
   const b = e.target.closest('button'); if (!b) return;
   const g = +b.dataset.g, w = Q[qi];
-  grade(w.w, g);
-  if (g === 0 && !requeued.has(w.w)) { requeued.add(w.w); Q.push(w); }   // 忘记的词本轮末尾再出现一次
+  grade(w.id, g);
+  if (g === 0 && !requeued.has(w.id)) { requeued.add(w.id); Q.push(w); }   // 忘记的词本轮末尾再出现一次
   next();
 };
 function next() {
@@ -1419,7 +1444,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft' && qi > 0) { qi--; drawCard(); }
   if (e.key === 'Escape') $('stClose').click();
 });
-$('hdS').textContent = `${ALL.length} 词 · 音标 · 拆音节 · 朗读`;
+$('hdS').textContent = `${Object.values(BOOKS).reduce((n, b) => n + b.words.length, 0)} 词 · 音标 · 拆音节 · 朗读`;
 booted = true;
 render();
 </script>
