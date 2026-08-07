@@ -23,6 +23,9 @@ try:
 except ImportError:
     TRANS_PHY = {}
 
+_dup = set(PHON) & set(PHON_PHY)
+if _dup:
+    raise SystemExit('phon_phy.py 重复定义了 phon.py 已有的词: %s' % sorted(_dup))
 PHON = {**PHON, **PHON_PHY}                 # 物理独有词补进来，同名词沿用 phon.py 的
 STRICT_PHON = False                         # Task 8 填完 phon_phy.py 后翻成 True
 
