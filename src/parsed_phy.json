@@ -1,0 +1,1042 @@
+{
+ "sections": [
+  {
+   "cn": "题目指令词",
+   "en": "Command words",
+   "items": [
+    {
+     "w": "calculate",
+     "zh": "计算",
+     "ex": "Calculate the average speed.",
+     "exzh": "计算平均速度。"
+    },
+    {
+     "w": "compare",
+     "zh": "比较",
+     "ex": "Compare the two graphs.",
+     "exzh": "比较两幅图。"
+    },
+    {
+     "w": "define",
+     "zh": "定义",
+     "ex": "Define acceleration.",
+     "exzh": "定义加速度。"
+    },
+    {
+     "w": "describe",
+     "zh": "描述",
+     "ex": "Describe the motion of the car.",
+     "exzh": "描述汽车的运动。"
+    },
+    {
+     "w": "determine",
+     "zh": "确定/求出",
+     "ex": "Determine the density of the block.",
+     "exzh": "求出物块的密度。"
+    },
+    {
+     "w": "explain",
+     "zh": "解释",
+     "ex": "Explain why the pressure increases.",
+     "exzh": "解释压强为什么增大。"
+    },
+    {
+     "w": "identify",
+     "zh": "识别/指出",
+     "ex": "Identify the independent variable.",
+     "exzh": "指出自变量。"
+    },
+    {
+     "w": "predict",
+     "zh": "预测",
+     "ex": "Predict what happens when the force increases.",
+     "exzh": "预测力增大时会发生什么。"
+    },
+    {
+     "w": "sketch",
+     "zh": "草图",
+     "ex": "Sketch a distance–time graph.",
+     "exzh": "画出距离—时间图的草图。"
+    },
+    {
+     "w": "state",
+     "zh": "陈述",
+     "ex": "State the unit of force.",
+     "exzh": "写出力的单位。"
+    },
+    {
+     "w": "suggest",
+     "zh": "提出合理建议",
+     "ex": "Suggest one improvement.",
+     "exzh": "提出一项改进建议。"
+    },
+    {
+     "w": "show",
+     "zh": "说明/证明",
+     "ex": "Show that the speed is 5 m/s.",
+     "exzh": "说明速度是5 米/秒。"
+    }
+   ]
+  },
+  {
+   "cn": "测量与数据",
+   "en": "Measurement and data",
+   "items": [
+    {
+     "w": "physical quantity",
+     "zh": "物理量",
+     "ex": "Time is a physical quantity.",
+     "exzh": "时间是一种物理量。"
+    },
+    {
+     "w": "unit",
+     "zh": "单位",
+     "ex": "Always include a unit.",
+     "exzh": "答案必须包含单位。"
+    },
+    {
+     "w": "SI unit",
+     "zh": "国际单位",
+     "ex": "The SI unit of mass is the kilogram.",
+     "exzh": "质量的国际单位是千克。"
+    },
+    {
+     "w": "length",
+     "zh": "长度",
+     "ex": "Measure the length with a ruler.",
+     "exzh": "用直尺测量长度。"
+    },
+    {
+     "w": "mass",
+     "zh": "质量",
+     "ex": "Mass is measured in kilograms.",
+     "exzh": "质量用千克测量。"
+    },
+    {
+     "w": "time",
+     "zh": "时间",
+     "ex": "Record the time in seconds.",
+     "exzh": "用秒记录时间。"
+    },
+    {
+     "w": "volume",
+     "zh": "体积",
+     "ex": "The volume is 50 cm³.",
+     "exzh": "体积是50 立方厘米。"
+    },
+    {
+     "w": "precision",
+     "zh": "精度",
+     "ex": "The instrument has a precision of 1 mm.",
+     "exzh": "仪器精度为1 毫米。"
+    },
+    {
+     "w": "resolution",
+     "zh": "分辨率",
+     "ex": "Resolution is the smallest change that can be detected.",
+     "exzh": "分辨率是仪器可检测的最小变 化。"
+    },
+    {
+     "w": "uncertainty",
+     "zh": "不确定度",
+     "ex": "Every measurement has uncertainty.",
+     "exzh": "每次测量都存在不确定度。"
+    },
+    {
+     "w": "error",
+     "zh": "误差",
+     "ex": "Parallax can cause a reading error.",
+     "exzh": "视差会造成读数误差。"
+    },
+    {
+     "w": "parallax",
+     "zh": "视差",
+     "ex": "Read the scale directly from above to avoid parallax.",
+     "exzh": "从正上方读数以避免视差。"
+    },
+    {
+     "w": "repeat",
+     "zh": "重复",
+     "ex": "Repeat the measurement three times.",
+     "exzh": "重复测量三次。"
+    },
+    {
+     "w": "mean",
+     "zh": "平均值",
+     "ex": "Calculate the mean of the valid results.",
+     "exzh": "计算有效结果的平均值。"
+    },
+    {
+     "w": "anomalous result",
+     "zh": "异常结果",
+     "ex": "The value 9.8 s is anomalous.",
+     "exzh": "9.8 秒是异常结果。"
+    },
+    {
+     "w": "reliable",
+     "zh": "可靠的",
+     "ex": "Repeated results improve reliability.",
+     "exzh": "重复结果提高可靠性。"
+    },
+    {
+     "w": "accurate",
+     "zh": "准确的",
+     "ex": "An accurate value is close to the true value.",
+     "exzh": "准确值接近真实值。"
+    }
+   ]
+  },
+  {
+   "cn": "运动",
+   "en": "Motion",
+   "items": [
+    {
+     "w": "motion",
+     "zh": "运动",
+     "ex": "The object is in motion.",
+     "exzh": "物体正在运动。"
+    },
+    {
+     "w": "rest",
+     "zh": "静止",
+     "ex": "The book is at rest.",
+     "exzh": "书处于静止状态。"
+    },
+    {
+     "w": "reference point",
+     "zh": "参照物",
+     "ex": "Motion is relative to a reference point.",
+     "exzh": "运动相对于参照物描述。"
+    },
+    {
+     "w": "distance",
+     "zh": "路程",
+     "ex": "The total distance is 200 m.",
+     "exzh": "总路程是200 米。"
+    },
+    {
+     "w": "displacement",
+     "zh": "位移",
+     "ex": "Displacement includes direction.",
+     "exzh": "位移包含方向。"
+    },
+    {
+     "w": "speed",
+     "zh": "速度/速率",
+     "ex": "Speed tells us how fast an object moves.",
+     "exzh": "速度表示物体运动得多快。"
+    },
+    {
+     "w": "average speed",
+     "zh": "平均速度",
+     "ex": "Average speed uses total distance and total time.",
+     "exzh": "平均速度使用总路程和总时间。"
+    },
+    {
+     "w": "velocity",
+     "zh": "速度（含方向）",
+     "ex": "Velocity includes direction.",
+     "exzh": "速度包含方向。"
+    },
+    {
+     "w": "constant speed",
+     "zh": "恒定速度",
+     "ex": "The car moves at constant speed.",
+     "exzh": "汽车以恒定速度运动。"
+    },
+    {
+     "w": "acceleration",
+     "zh": "加速度",
+     "ex": "Acceleration is change in velocity per unit time.",
+     "exzh": "加速度是单位时间内速度的变 化。"
+    },
+    {
+     "w": "deceleration",
+     "zh": "减速度",
+     "ex": "The car decelerates when braking.",
+     "exzh": "汽车刹车时减速。"
+    },
+    {
+     "w": "initial velocity",
+     "zh": "初速度",
+     "ex": "The initial velocity is zero.",
+     "exzh": "初速度为零。"
+    },
+    {
+     "w": "final velocity",
+     "zh": "末速度",
+     "ex": "The final velocity is 12 m/s.",
+     "exzh": "末速度为12 米/秒。"
+    },
+    {
+     "w": "distance–time graph",
+     "zh": "距离—时间图",
+     "ex": "The gradient of a distance– time graph is speed.",
+     "exzh": "距离—时间图的斜率表示速度。"
+    },
+    {
+     "w": "speed–time graph",
+     "zh": "速度—时间图",
+     "ex": "A horizontal line shows constant speed.",
+     "exzh": "水平线表示恒定速度。"
+    },
+    {
+     "w": "gradient",
+     "zh": "斜率",
+     "ex": "A steeper gradient means greater speed.",
+     "exzh": "斜率越陡，速度越大。"
+    },
+    {
+     "w": "stationary",
+     "zh": "静止的",
+     "ex": "The object is stationary from 4 s to 6 s.",
+     "exzh": "物体在4 到6 秒静止。"
+    }
+   ]
+  },
+  {
+   "cn": "力",
+   "en": "Forces",
+   "items": [
+    {
+     "w": "force",
+     "zh": "力",
+     "ex": "A force can change motion.",
+     "exzh": "力可以改变运动。"
+    },
+    {
+     "w": "newton",
+     "zh": "牛顿",
+     "ex": "Force is measured in newtons.",
+     "exzh": "力用牛顿测量。"
+    },
+    {
+     "w": "push",
+     "zh": "推",
+     "ex": "A push moves the box away.",
+     "exzh": "推力使箱子远离。"
+    },
+    {
+     "w": "pull",
+     "zh": "拉",
+     "ex": "A pull moves the box towards you.",
+     "exzh": "拉力使箱子靠近你。"
+    },
+    {
+     "w": "friction",
+     "zh": "摩擦力",
+     "ex": "Friction opposes motion.",
+     "exzh": "摩擦力阻碍运动。"
+    },
+    {
+     "w": "air resistance",
+     "zh": "空气阻力",
+     "ex": "Air resistance acts opposite to motion.",
+     "exzh": "空气阻力方向与运动方向相反。"
+    },
+    {
+     "w": "drag",
+     "zh": "阻力",
+     "ex": "Drag increases with speed.",
+     "exzh": "阻力随速度增加。"
+    },
+    {
+     "w": "gravity",
+     "zh": "重力作用/引力",
+     "ex": "Gravity pulls objects towards Earth.",
+     "exzh": "重力把物体拉向地球。"
+    },
+    {
+     "w": "weight",
+     "zh": "重量",
+     "ex": "Weight is a gravitational force.",
+     "exzh": "重量是一种重力。"
+    },
+    {
+     "w": "gravitational field strength",
+     "zh": "重力场强度",
+     "ex": "On Earth, g is about 9.8 N/kg.",
+     "exzh": "地球表面g 约为9.8 牛/千克。"
+    },
+    {
+     "w": "normal contact force",
+     "zh": "支持力",
+     "ex": "The table exerts a normal contact force.",
+     "exzh": "桌面对物体施加支持力。"
+    },
+    {
+     "w": "tension",
+     "zh": "拉力/张力",
+     "ex": "The rope is under tension.",
+     "exzh": "绳子受到张力。"
+    },
+    {
+     "w": "resultant force",
+     "zh": "合力",
+     "ex": "A non-zero resultant force causes acceleration.",
+     "exzh": "非零合力引起加速度。"
+    },
+    {
+     "w": "balanced forces",
+     "zh": "平衡力",
+     "ex": "Balanced forces give zero resultant force.",
+     "exzh": "平衡力的合力为零。"
+    },
+    {
+     "w": "unbalanced forces",
+     "zh": "不平衡力",
+     "ex": "Unbalanced forces change motion.",
+     "exzh": "不平衡力改变运动状态。"
+    },
+    {
+     "w": "free fall",
+     "zh": "自由落体",
+     "ex": "In free fall, gravity is the only force.",
+     "exzh": "自由落体中只有重力作用。"
+    },
+    {
+     "w": "terminal velocity",
+     "zh": "终端速度",
+     "ex": "Terminal velocity occurs when forces are balanced.",
+     "exzh": "力平衡时达到终端速度。"
+    }
+   ]
+  },
+  {
+   "cn": "能量、功与功率",
+   "en": "Energy, work and power",
+   "items": [
+    {
+     "w": "energy",
+     "zh": "能量",
+     "ex": "Energy is conserved.",
+     "exzh": "能量守恒。"
+    },
+    {
+     "w": "energy store",
+     "zh": "能量储存",
+     "ex": "A moving car has a kinetic energy store.",
+     "exzh": "运动汽车具有动能储存。"
+    },
+    {
+     "w": "kinetic energy",
+     "zh": "动能",
+     "ex": "Kinetic energy depends on mass and speed.",
+     "exzh": "动能取决于质量和速度。"
+    },
+    {
+     "w": "gravitational potential energy",
+     "zh": "重力势能",
+     "ex": "A raised object has gravitational potential energy.",
+     "exzh": "被举高物体具有重力势能。"
+    },
+    {
+     "w": "elastic potential energy",
+     "zh": "弹性势能",
+     "ex": "A stretched spring stores elastic energy.",
+     "exzh": "拉伸弹簧储存弹性势能。"
+    },
+    {
+     "w": "chemical energy",
+     "zh": "化学能",
+     "ex": "Fuel has a chemical energy store.",
+     "exzh": "燃料具有化学能储存。"
+    },
+    {
+     "w": "thermal energy",
+     "zh": "内能/热能",
+     "ex": "Some energy is transferred thermally.",
+     "exzh": "部分能量以热方式转移。"
+    },
+    {
+     "w": "transfer",
+     "zh": "转移",
+     "ex": "Energy is transferred electrically.",
+     "exzh": "能量通过电方式转移。"
+    },
+    {
+     "w": "conservation of energy",
+     "zh": "能量守恒",
+     "ex": "Total energy is conserved.",
+     "exzh": "总能量守恒。"
+    },
+    {
+     "w": "work done",
+     "zh": "做功",
+     "ex": "Work is done when a force moves an object.",
+     "exzh": "力使物体移动时做功。"
+    },
+    {
+     "w": "joule",
+     "zh": "焦耳",
+     "ex": "Work is measured in joules.",
+     "exzh": "功用焦耳测量。"
+    },
+    {
+     "w": "power",
+     "zh": "功率",
+     "ex": "Power is energy transferred per unit time.",
+     "exzh": "功率是单位时间转移的能量。"
+    },
+    {
+     "w": "watt",
+     "zh": "瓦特",
+     "ex": "Power is measured in watts.",
+     "exzh": "功率用瓦特测量。"
+    },
+    {
+     "w": "useful energy",
+     "zh": "有用能量",
+     "ex": "Light is the useful energy output of a lamp.",
+     "exzh": "光是灯泡的有用能量输出。"
+    },
+    {
+     "w": "wasted energy",
+     "zh": "浪费能量",
+     "ex": "Thermal energy may be wasted.",
+     "exzh": "内能可能是浪费能量。"
+    },
+    {
+     "w": "efficiency",
+     "zh": "效率",
+     "ex": "Efficiency cannot exceed 100%.",
+     "exzh": "效率不能超过100%。"
+    }
+   ]
+  },
+  {
+   "cn": "密度、压强与流体",
+   "en": "Density, pressure and fluids",
+   "items": [
+    {
+     "w": "density",
+     "zh": "密度",
+     "ex": "Density is mass divided by volume.",
+     "exzh": "密度等于质量除以体积。"
+    },
+    {
+     "w": "regular object",
+     "zh": "规则物体",
+     "ex": "Measure the dimensions of a regular object.",
+     "exzh": "测量规则物体的尺寸。"
+    },
+    {
+     "w": "irregular object",
+     "zh": "不规则物体",
+     "ex": "Use water displacement for an irregular object.",
+     "exzh": "不规则物体用排水法测体积。"
+    },
+    {
+     "w": "water displacement",
+     "zh": "排水法",
+     "ex": "The stone’s volume is found by water displacement.",
+     "exzh": "石块体积通过排水法测得。"
+    },
+    {
+     "w": "float",
+     "zh": "漂浮",
+     "ex": "The object floats on water.",
+     "exzh": "物体漂浮在水面。"
+    },
+    {
+     "w": "sink",
+     "zh": "下沉",
+     "ex": "The object sinks because it is denser than water.",
+     "exzh": "物体因密度大于水而下沉。"
+    },
+    {
+     "w": "pressure",
+     "zh": "压强",
+     "ex": "Pressure is force per unit area.",
+     "exzh": "压强是单位面积上的力。"
+    },
+    {
+     "w": "area",
+     "zh": "面积",
+     "ex": "A smaller area gives greater pressure.",
+     "exzh": "面积越小压强越大。"
+    },
+    {
+     "w": "pascal",
+     "zh": "帕斯卡",
+     "ex": "Pressure is measured in pascals.",
+     "exzh": "压强用帕斯卡测量。"
+    },
+    {
+     "w": "atmospheric pressure",
+     "zh": "大气压强",
+     "ex": "Atmospheric pressure acts in all directions.",
+     "exzh": "大气压强向各个方向作用。"
+    },
+    {
+     "w": "liquid pressure",
+     "zh": "液体压强",
+     "ex": "Liquid pressure increases with depth.",
+     "exzh": "液体压强随深度增加。"
+    },
+    {
+     "w": "upthrust",
+     "zh": "浮力",
+     "ex": "Upthrust acts upward on an object in a fluid.",
+     "exzh": "流体中的物体受到向上的浮力。"
+    }
+   ]
+  },
+  {
+   "cn": "热学",
+   "en": "Thermal physics",
+   "items": [
+    {
+     "w": "temperature",
+     "zh": "温度",
+     "ex": "Temperature measures how hot or cold something is.",
+     "exzh": "温度表示物体冷热程度。"
+    },
+    {
+     "w": "thermal energy transfer",
+     "zh": "热能转移",
+     "ex": "Thermal energy transfers from hot to cold.",
+     "exzh": "热能从高温物体转移到低温物 体。"
+    },
+    {
+     "w": "conduction",
+     "zh": "热传导",
+     "ex": "Metals are good thermal conductors.",
+     "exzh": "金属是良好的热导体。"
+    },
+    {
+     "w": "convection",
+     "zh": "对流",
+     "ex": "Convection occurs in fluids.",
+     "exzh": "对流发生在流体中。"
+    },
+    {
+     "w": "radiation",
+     "zh": "热辐射",
+     "ex": "Infrared radiation transfers energy through a vacuum.",
+     "exzh": "红外辐射可在真空中传递能量。"
+    },
+    {
+     "w": "specific heat capacity",
+     "zh": "比热容",
+     "ex": "Water has a high specific heat capacity.",
+     "exzh": "水的比热容较大。"
+    },
+    {
+     "w": "melting",
+     "zh": "熔化",
+     "ex": "Melting changes a solid into a liquid.",
+     "exzh": "熔化把固体变成液体。"
+    },
+    {
+     "w": "boiling",
+     "zh": "沸腾",
+     "ex": "Boiling occurs throughout a liquid.",
+     "exzh": "沸腾发生在液体内部和表面。"
+    },
+    {
+     "w": "evaporation",
+     "zh": "蒸发",
+     "ex": "Evaporation occurs at the surface.",
+     "exzh": "蒸发发生在液体表面。"
+    },
+    {
+     "w": "condensation",
+     "zh": "凝结",
+     "ex": "Condensation changes gas into liquid.",
+     "exzh": "凝结把气体变成液体。"
+    }
+   ]
+  },
+  {
+   "cn": "波、声音与光",
+   "en": "Waves, sound and light",
+   "items": [
+    {
+     "w": "wave",
+     "zh": "波",
+     "ex": "A wave transfers energy.",
+     "exzh": "波传递能量。"
+    },
+    {
+     "w": "transverse wave",
+     "zh": "横波",
+     "ex": "Light is a transverse wave.",
+     "exzh": "光是横波。"
+    },
+    {
+     "w": "longitudinal wave",
+     "zh": "纵波",
+     "ex": "Sound in air is longitudinal.",
+     "exzh": "空气中的声波是纵波。"
+    },
+    {
+     "w": "amplitude",
+     "zh": "振幅",
+     "ex": "Greater amplitude means more energy.",
+     "exzh": "振幅越大，能量越多。"
+    },
+    {
+     "w": "wavelength",
+     "zh": "波长",
+     "ex": "Wavelength is measured in metres.",
+     "exzh": "波长用米测量。"
+    },
+    {
+     "w": "frequency",
+     "zh": "频率",
+     "ex": "Frequency is measured in hertz.",
+     "exzh": "频率用赫兹测量。"
+    },
+    {
+     "w": "period",
+     "zh": "周期",
+     "ex": "Period is the time for one complete wave.",
+     "exzh": "周期是一次完整振动所需时间。"
+    },
+    {
+     "w": "wave speed",
+     "zh": "波速",
+     "ex": "Wave speed equals frequency times wavelength.",
+     "exzh": "波速等于频率乘波长。"
+    },
+    {
+     "w": "reflection",
+     "zh": "反射",
+     "ex": "Light reflects from a mirror.",
+     "exzh": "光从镜面反射。"
+    },
+    {
+     "w": "refraction",
+     "zh": "折射",
+     "ex": "Light changes direction when it enters glass.",
+     "exzh": "光进入玻璃时改变方向。"
+    },
+    {
+     "w": "normal",
+     "zh": "法线",
+     "ex": "Angles are measured from the normal.",
+     "exzh": "角度从法线量起。"
+    },
+    {
+     "w": "angle of incidence",
+     "zh": "入射角",
+     "ex": "The angle of incidence equals the angle of reflection.",
+     "exzh": "入射角等于反射角。"
+    },
+    {
+     "w": "sound",
+     "zh": "声音",
+     "ex": "Sound needs a medium to travel.",
+     "exzh": "声音传播需要介质。"
+    },
+    {
+     "w": "vacuum",
+     "zh": "真空",
+     "ex": "Sound cannot travel through a vacuum.",
+     "exzh": "声音不能在真空中传播。"
+    },
+    {
+     "w": "echo",
+     "zh": "回声",
+     "ex": "An echo is reflected sound.",
+     "exzh": "回声是反射的声音。"
+    }
+   ]
+  },
+  {
+   "cn": "电与磁",
+   "en": "Electricity and magnetism",
+   "items": [
+    {
+     "w": "electric charge",
+     "zh": "电荷",
+     "ex": "Charge is measured in coulombs.",
+     "exzh": "电荷量用库仑测量。"
+    },
+    {
+     "w": "current",
+     "zh": "电流",
+     "ex": "Current is the rate of flow of charge.",
+     "exzh": "电流是电荷流动的速率。"
+    },
+    {
+     "w": "ampere",
+     "zh": "安培",
+     "ex": "Current is measured in amperes.",
+     "exzh": "电流用安培测量。"
+    },
+    {
+     "w": "potential difference",
+     "zh": "电势差/电压",
+     "ex": "Potential difference transfers energy per unit charge.",
+     "exzh": "电势差表示单位电荷转移的能 量。"
+    },
+    {
+     "w": "voltage",
+     "zh": "电压",
+     "ex": "Voltage is measured in volts.",
+     "exzh": "电压用伏特测量。"
+    },
+    {
+     "w": "resistance",
+     "zh": "电阻",
+     "ex": "Resistance opposes current.",
+     "exzh": "电阻阻碍电流。"
+    },
+    {
+     "w": "circuit",
+     "zh": "电路",
+     "ex": "Current flows in a complete circuit.",
+     "exzh": "电流在完整电路中流动。"
+    },
+    {
+     "w": "series circuit",
+     "zh": "串联电路",
+     "ex": "Current is the same in a series circuit.",
+     "exzh": "串联电路中各处电流相同。"
+    },
+    {
+     "w": "parallel circuit",
+     "zh": "并联电路",
+     "ex": "Potential difference is the same across parallel branches.",
+     "exzh": "并联支路两端电压相同。"
+    },
+    {
+     "w": "conductor",
+     "zh": "导体",
+     "ex": "Copper is a good conductor.",
+     "exzh": "铜是良导体。"
+    },
+    {
+     "w": "insulator",
+     "zh": "绝缘体",
+     "ex": "Plastic is an electrical insulator.",
+     "exzh": "塑料是电绝缘体。"
+    },
+    {
+     "w": "magnetic field",
+     "zh": "磁场",
+     "ex": "A magnetic field surrounds a magnet.",
+     "exzh": "磁体周围存在磁场。"
+    },
+    {
+     "w": "electromagnet",
+     "zh": "电磁铁",
+     "ex": "An electromagnet can be switched on and off.",
+     "exzh": "电磁铁可以接通和断开。"
+    },
+    {
+     "w": "transformer",
+     "zh": "变压器",
+     "ex": "A transformer changes alternating voltage.",
+     "exzh": "变压器改变交流电压。"
+    }
+   ]
+  },
+  {
+   "cn": "原子核与空间物理",
+   "en": "Nuclear and space physics",
+   "items": [
+    {
+     "w": "atom",
+     "zh": "原子",
+     "ex": "An atom has a nucleus and electrons.",
+     "exzh": "原子由原子核和电子组成。"
+    },
+    {
+     "w": "nucleus",
+     "zh": "原子核",
+     "ex": "The nucleus contains protons and neutrons.",
+     "exzh": "原子核包含质子和中子。"
+    },
+    {
+     "w": "proton",
+     "zh": "质子",
+     "ex": "A proton has positive charge.",
+     "exzh": "质子带正电。"
+    },
+    {
+     "w": "neutron",
+     "zh": "中子",
+     "ex": "A neutron has no charge.",
+     "exzh": "中子不带电。"
+    },
+    {
+     "w": "electron",
+     "zh": "电子",
+     "ex": "An electron has negative charge.",
+     "exzh": "电子带负电。"
+    },
+    {
+     "w": "isotope",
+     "zh": "同位素",
+     "ex": "Isotopes have the same proton number.",
+     "exzh": "同位素质子数相同。"
+    },
+    {
+     "w": "radioactive decay",
+     "zh": "放射性衰变",
+     "ex": "Radioactive decay is random and spontaneous.",
+     "exzh": "放射性衰变具有随机性和自发 性。"
+    },
+    {
+     "w": "alpha particle",
+     "zh": "α粒子",
+     "ex": "Alpha particles are strongly ionising.",
+     "exzh": "α粒子电离能力强。"
+    },
+    {
+     "w": "beta particle",
+     "zh": "β粒子",
+     "ex": "Beta particles are moderately penetrating.",
+     "exzh": "β粒子穿透能力中等。"
+    },
+    {
+     "w": "gamma radiation",
+     "zh": "γ射线",
+     "ex": "Gamma radiation is highly penetrating.",
+     "exzh": "γ射线穿透能力强。"
+    },
+    {
+     "w": "half-life",
+     "zh": "半衰期",
+     "ex": "Half-life is the time for activity to halve.",
+     "exzh": "半衰期是活度减半所需时间。"
+    },
+    {
+     "w": "planet",
+     "zh": "行星",
+     "ex": "Earth is a planet.",
+     "exzh": "地球是一颗行星。"
+    },
+    {
+     "w": "orbit",
+     "zh": "轨道/绕行",
+     "ex": "Planets orbit the Sun.",
+     "exzh": "行星绕太阳运行。"
+    },
+    {
+     "w": "gravitational field",
+     "zh": "重力场",
+     "ex": "The Sun’s gravitational field keeps planets in orbit.",
+     "exzh": "太阳重力场使行星保持轨道运 动。"
+    },
+    {
+     "w": "star",
+     "zh": "恒星",
+     "ex": "The Sun is a star.",
+     "exzh": "太阳是一颗恒星。"
+    },
+    {
+     "w": "galaxy",
+     "zh": "星系",
+     "ex": "The Milky Way is a galaxy.",
+     "exzh": "银河系是一个星系。"
+    },
+    {
+     "w": "light-year",
+     "zh": "光年",
+     "ex": "A light-year is a unit of distance.",
+     "exzh": "光年是距离单位。"
+    }
+   ]
+  },
+  {
+   "cn": "实验技能",
+   "en": "Experimental skills",
+   "items": [
+    {
+     "w": "independent variable",
+     "zh": "自变量",
+     "ex": "Change the independent variable.",
+     "exzh": "改变自变量。"
+    },
+    {
+     "w": "dependent variable",
+     "zh": "因变量",
+     "ex": "Measure the dependent variable.",
+     "exzh": "测量因变量。"
+    },
+    {
+     "w": "control variable",
+     "zh": "控制变量",
+     "ex": "Keep control variables constant.",
+     "exzh": "保持控制变量不变。"
+    },
+    {
+     "w": "fair test",
+     "zh": "公平实验",
+     "ex": "A fair test changes one main factor.",
+     "exzh": "公平实验只改变一个主要因素。"
+    },
+    {
+     "w": "method",
+     "zh": "方法",
+     "ex": "Write a clear experimental method.",
+     "exzh": "写出清晰实验方法。"
+    },
+    {
+     "w": "apparatus",
+     "zh": "仪器装置",
+     "ex": "List the apparatus needed.",
+     "exzh": "列出所需仪器。"
+    },
+    {
+     "w": "observation",
+     "zh": "观察结果",
+     "ex": "Record each observation.",
+     "exzh": "记录每个观察结果。"
+    },
+    {
+     "w": "result",
+     "zh": "结果",
+     "ex": "Enter the result in a table.",
+     "exzh": "把结果填入表格。"
+    },
+    {
+     "w": "conclusion",
+     "zh": "结论",
+     "ex": "The conclusion must use the evidence.",
+     "exzh": "结论必须使用证据。"
+    },
+    {
+     "w": "evidence",
+     "zh": "证据",
+     "ex": "Use data as evidence.",
+     "exzh": "使用数据作为证据。"
+    },
+    {
+     "w": "risk",
+     "zh": "风险",
+     "ex": "State the risk and how to reduce it.",
+     "exzh": "写出风险及降低风险的方法。"
+    },
+    {
+     "w": "safety precaution",
+     "zh": "安全措施",
+     "ex": "Wear goggles as a safety precaution.",
+     "exzh": "佩戴护目镜作为安全措施。"
+    },
+    {
+     "w": "valid",
+     "zh": "有效的",
+     "ex": "A valid test answers the stated question.",
+     "exzh": "有效实验能回答所提出的问题。"
+    },
+    {
+     "w": "range",
+     "zh": "范围",
+     "ex": "Use a wide range of values.",
+     "exzh": "使用较宽的数据范围。"
+    },
+    {
+     "w": "interval",
+     "zh": "间隔",
+     "ex": "Use equal intervals.",
+     "exzh": "使用相等间隔。"
+    }
+   ]
+  }
+ ]
+}
