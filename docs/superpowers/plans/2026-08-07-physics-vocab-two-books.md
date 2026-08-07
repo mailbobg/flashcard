@@ -284,9 +284,14 @@ from trans import TRANS                     # 已有
 from frames_phy import FRAMES_PHY           # noqa: E402
 ```
 
-在 `from phon import PHON` 之后合并字典（物理独有词补进来，同名词沿用 phon.py 的）：
+在 `from phon import PHON` 之后合并字典。`phon_phy.py` 按约定只收 `phon.py`
+没有的词，所以两边**不应该**有交集 —— 用断言把这个约定变成会响的校验，
+而不是靠字典合并的优先级去悄悄裁决：
 
 ```python
+_dup = set(PHON) & set(PHON_PHY)
+if _dup:
+    raise SystemExit('phon_phy.py 重复定义了 phon.py 已有的词: %s' % sorted(_dup))
 PHON = {**PHON, **PHON_PHY}
 ```
 
