@@ -1,3 +1,48 @@
 # -*- coding: utf-8 -*-
-"""物理的高频答题句型。字段与 data.json 里 frames 一致。"""
-FRAMES_PHY = []
+"""物理的高频答题句型。字段与 data.json 里 frames 一致。
+
+来源：Cambridge IGCSE Physics 0625 核心词汇表最后一节。
+use 是我们补的用途说明，原书没有。
+"""
+FRAMES_PHY = [
+    {"use": "描述两个量的变化关系",
+     "frame": "As ___ increases, ___ increases/decreases.",
+     "ex": "As the force increases, the acceleration increases.",
+     "exzh": "随着力增大，加速度增大。"},
+    {"use": "判断物体静止并给理由",
+     "frame": "The object is stationary because ___.",
+     "ex": "The object is stationary because the resultant force is zero.",
+     "exzh": "物体静止，因为合力为零。"},
+    {"use": "比较两次结果并给理由",
+     "frame": "The result is greater because ___.",
+     "ex": "The result is greater because the temperature is higher.",
+     "exzh": "结果更大，因为温度更高。"},
+    {"use": "论证实验是公平实验",
+     "frame": "This is a fair test because only the independent variable is changed.",
+     "ex": "This is a fair test because only the independent variable is changed.",
+     "exzh": "这是公平实验，因为只有自变量被改变。"},
+    {"use": "写提高可靠性的做法",
+     "frame": "Repeat the measurements, identify anomalies and calculate a mean.",
+     "ex": "Repeat the measurements, identify anomalies and calculate a mean.",
+     "exzh": "重复测量、识别异常值并计算平均值。"},
+    {"use": "解释压强变化",
+     "frame": "The same force acts over a smaller area, so the pressure is greater.",
+     "ex": "The same force acts over a smaller area, so the pressure is greater.",
+     "exzh": "相同的力作用在更小面积上，因此压强更大。"},
+    {"use": "由受力平衡推合力",
+     "frame": "The forces are balanced, so the resultant force is zero.",
+     "ex": "The forces are balanced, so the resultant force is zero.",
+     "exzh": "力平衡，因此合力为零。"},
+    {"use": "描述能量转移",
+     "frame": "Energy is transferred from ___ to ___.",
+     "ex": "Energy is transferred from the chemical store to the thermal store.",
+     "exzh": "能量从化学能储存转移到内能储存。"},
+    {"use": "指出答案缺单位",
+     "frame": "The answer is incomplete because the unit is missing.",
+     "ex": "The answer is incomplete because the unit is missing.",
+     "exzh": "答案不完整，因为缺少单位。"},
+    {"use": "读图线斜率",
+     "frame": "The graph is steeper, so the speed is greater.",
+     "ex": "The graph is steeper, so the speed is greater.",
+     "exzh": "图线更陡，因此速度更大。"},
+]
