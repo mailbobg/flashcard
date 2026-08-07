@@ -5,13 +5,15 @@
 
 字段：
   id       课时序号
+  book     这节课属于哪本词书："sci" 科学 / "phy" 物理
   title    小标题（这节讲什么）
   course   课程名
   mins     建议用时
   intro    预习要求，逐条列出
   goals    预习目标，可勾选
-  vocab    重点词汇：[英文, 理解提示]。英文必须能在词库里查到，
-           构建时会校验；点进去直接进闪卡流程
+  vocab    重点词汇：[英文, 理解提示]。英文写成 "sci:diffusion" 可跨书引用，
+           不带前缀就按本课的 book 解析。构建时会校验能否查到；
+           点进去直接进闪卡流程
   reading  阅读材料：[小标题, [句子, ...]]
            每个句子是一个 dict：
              zh    中文原句（多句拼起来就是段落，界面按段落显示）
@@ -27,8 +29,9 @@
 LESSONS = [
 {
     "id": 3,
+    "book": "phy",
     "title": "扩散、布朗运动与气体规律",
-    "course": "Cambridge IGCSE Chemistry 0620 衔接课程",
+    "course": "Cambridge IGCSE Physics 0625 衔接课程",
     "mins": 20,
     "intro": [
         "先阅读、朗读词汇，再回到阅读材料。",
@@ -40,18 +43,18 @@ LESSONS = [
         "尝试解释温度和分子质量为什么会影响扩散速度。",
     ],
     "vocab": [
-        ["diffusion",               "粒子总体由高浓度区域向低浓度区域移动"],
-        ["Brownian motion",         "悬浮微粒受到分子不规则碰撞产生的随机运动"],
-        ["random",                  "方向不断变化、没有固定路线"],
-        ["concentration",           "一定空间中粒子的多少"],
-        ["high concentration",      "单位空间内粒子较多"],
-        ["low concentration",       "单位空间内粒子较少"],
-        ["net movement",            "综合所有随机运动后呈现的总体方向"],
-        ["collision",               "粒子相互撞击"],
-        ["kinetic energy",          "物体或粒子由于运动具有的能量"],
-        ["relative molecular mass", "一个分子中各原子相对质量的总和"],
-        ["pressure",                "粒子碰撞容器壁产生的作用"],
-        ["volume",                  "物质或气体占据的空间"],
+        ["sci:diffusion",               "粒子总体由高浓度区域向低浓度区域移动"],
+        ["sci:Brownian motion",         "悬浮微粒受到分子不规则碰撞产生的随机运动"],
+        ["sci:random",                  "方向不断变化、没有固定路线"],
+        ["sci:concentration",           "一定空间中粒子的多少"],
+        ["sci:net movement",            "综合所有随机运动后呈现的总体方向"],
+        ["sci:collision",               "粒子相互撞击"],
+        ["sci:relative molecular mass", "一个分子中各原子相对质量的总和"],
+        ["kinetic energy",              "物体或粒子由于运动具有的能量"],
+        ["mass",                        "物体含有的物质数量"],
+        ["pressure",                    "粒子碰撞容器壁产生的作用"],
+        ["temperature",                 "粒子平均动能的度量"],
+        ["volume",                      "物质或气体占据的空间"],
     ],
     "reading": [
         ["粒子一直在运动", [

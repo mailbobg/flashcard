@@ -110,10 +110,21 @@ def build_data():
 
 
 def attach_lessons(data):
-    """课时里引用的词必须在词库中查得到，否则「开始学这些词」会点空"""
+    """课时里引用的词必须在词库中查得到，否则「开始学这些词」会点空。
+
+    vocab 的词可写成 "sci:diffusion" 跨书引用；不带前缀就按课时自己的 book 解析。
+    """
     have = {w['id'] for bk in data['books'] for s in bk['sections'] for w in s['words']}
+    ids = {b['id'] for b in data['books']}
     for les in LESSONS:
-        miss = [v[0] for v in les['vocab'] if 'sci:' + v[0] not in have]
+        if les.get('book') not in ids:
+            raise SystemExit('第 %s 节的 book 字段应为 %s，实为 %r'
+                             % (les['id'], sorted(ids), les.get('book')))
+        miss = []
+        for v in les['vocab']:
+            wid = v[0] if ':' in v[0] else '%s:%s' % (les['book'], v[0])
+            if wid not in have:
+                miss.append(wid)
         if miss:
             raise SystemExit('第 %s 节引用了词库中不存在的词: %s' % (les['id'], miss))
     data['lessons'] = LESSONS
