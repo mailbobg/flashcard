@@ -857,6 +857,11 @@ $('hdS').textContent = `${Object.values(BOOKS).reduce((n, b) => n + b.words.leng
 - [ ] **Step 6: 把剩余的 `ALL` / `BY_W` 引用机械替换掉**
 
 **只换引用，不动任何布局或文案** —— 界面在本任务结束时必须和改动前长得一模一样。
+
+`DATA` 顶层现在只有 `books` 和 `lessons`，**`DATA.sections` 与 `DATA.frames` 都已不存在**，
+凡是读它们的地方都要换成 `curBook().sections` / `curBook().frames`。这同样是纯换数据来源，
+不改布局：默认书是 `sci` 时渲染结果与改造前逐字节相同。漏掉任何一处，对应的页面就会崩。
+
 先加两个解析课时词的辅助函数，放在 `/* ---------- 首页 ---------- */` 注释之前：
 
 ```js
@@ -897,13 +902,14 @@ const lessonWords = les => les.vocab.map(([w]) => BY_ID[lessonWordId(les, w)]).f
 `ALL` 全换成 `W`，`S.prog[w.w]` → `S.prog[w.id]`，
 `BY_W['photosynthesis']` → `BY_ID['sci:photosynthesis']`。
 
-替换完用这条确认没有遗漏：
+替换完用这两条确认没有遗漏：
 
 ```bash
 grep -n "BY_W\|\bALL\b" src/tpl.html
+grep -n "DATA\.\(sections\|frames\)" src/tpl.html
 ```
 
-Expected: 无输出。
+Expected: 两条都无输出。
 
 - [ ] **Step 7: 构建并在浏览器里验证迁移**
 
@@ -1399,6 +1405,9 @@ function renderList() {
 ```
 
 - [ ] **Step 2: 句型页跟随当前书**
+
+（Task 4 已经把数据来源换成 `curBook().frames`，本步实际新增的只有 `bookBarHTML()`
+与 `bindBookBar()` 两行。下面给出替换后的完整函数，照它对齐即可。）
 
 ```js
 /* ---------- 句型 ---------- */
