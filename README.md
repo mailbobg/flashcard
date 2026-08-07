@@ -1,6 +1,6 @@
 # IGCSE 科学词汇闪卡
 
-手机端 H5 背单词应用，覆盖 IGCSE 自然科学核心词汇 **164 词 + 10 组句型**。
+手机端 H5 背单词应用，两本词书：IGCSE 自然科学 **170 词**、Cambridge IGCSE Physics 0625 **162 词**，各带 10 组句型。
 单个 `index.html`，**零外部请求、可离线使用**，浏览器打开即可。
 
 线上地址：**<https://flash.imyway.cn/>**
@@ -20,8 +20,9 @@
 
 - 卡片正面单词 / 音标 / 音节，轻点翻面看中文释义、词根词缀助记、例句与翻译
 - 三档自评 + 间隔重复：即时 / 10 分钟 / 1 天 / 3 天 / 7 天 / 21 天；「忘记」的词本轮末尾再出现一次
-- 首页有今日到期复习、按主题进度、难词本
-- 词表支持搜索与「遮住中文」自测
+- 两本词书顶部切换，也可左右滑动；进度、复习队列、难词本各自独立
+- 学习页有今日到期复习、按主题网格、难词本；另一科有到期复习时在标签上挂红点
+- 词表支持搜索与「遮住中文」自测；搜索时自动跨科，同名词两科例句可直接对比
 - 进度存 `localStorage`，离线保留
 
 **其他**
@@ -43,14 +44,19 @@ python3 -m http.server 8777
 
 ```bash
 pip install pymupdf
-python3 src/parse_pdf.py <词汇表.pdf> > src/parsed.json   # 解析 PDF（可选，已附 data.json）
-python3 src/build.py                                      # 生成 index.html
+python3 src/parse_pdf.py <自然科学词汇表.pdf> > src/parsed.json      # 可选，已附 data.json
+python3 src/parse_physics_pdf.py <物理词汇表.pdf> > src/parsed_phy.json  # 可选，已入库
+python3 src/build.py                                                 # 生成 index.html
 ```
 
 | 文件 | 说明 |
 | --- | --- |
 | `src/parse_pdf.py` | 从 PDF 三栏表格解析出词条与句型 |
+| `src/parse_physics_pdf.py` | 从物理 PDF 的四栏表格解析词条，处理跨页续行与章内重复 |
 | `src/phon.py` | 手工编写的音标、音节切分与词根助记（164 条） |
+| `src/phon_phy.py` | 物理独有 111 词的音标、音节切分与词根助记 |
+| `src/trans_phy.py` | 物理 162 句的翻译思路 |
+| `src/frames_phy.py` | 物理的 10 组高频答题句型 |
 | `src/tpl.html` | 应用模板，含样式、逻辑与内嵌字体，`__DATA__` 为词条占位符 |
 | `src/data.json` | 合成后的词条数据 |
 | `src/build.py` | 合成数据并注入模板，产出根目录 `index.html`（含音节拼写校验） |
@@ -68,6 +74,7 @@ python3 src/build.py                                      # 生成 index.html
 ```
 
 整词音标由各音节音标拼接得出，因此只需维护一处。
+两本词书共用同一份音标字典——51 个同名词音标一致，不重复维护。
 
 ## 说明
 
