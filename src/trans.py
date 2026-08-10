@@ -780,6 +780,110 @@ TRANS = {
     "tip": "「at that temperature」不能漏——饱和是有温度前提的，升温后还能继续溶。中文把这个条件提到句首。",
 },
 
+"mix": {
+    "pat": "祈使句 + 目的不定式",
+    "flow": [["Stir", "搅拌", "v"], ["the mixture", "混合物", "h"],
+             ["to mix the two liquids", "以混合两种液体", "a"]],
+    "core": ["Stir the mixture", "搅拌混合物"],
+    "final": [["搅拌", "v"], ["混合物", "h"], ["，", ""], ["使两种液体", "a"], ["混合", "v"], ["。", ""]],
+    "tip": "to mix 是不定式表目的。mix 作及物动词时直接跟宾语，例如 mix A with B。",
+},
+
+"uniform": {
+    "pat": "主谓宾（最简）",
+    "flow": [["The mixture", "混合物", "s"], ["has", "有", "v"], ["a uniform composition", "均匀的组成", "h"]],
+    "core": ["The mixture has a uniform composition", "混合物的组成均匀"],
+    "asm": [["混合物的", "d"], ["组成", "h"], ["是均匀的", "v"]],
+    "final": [["混合物的", "d"], ["组成", "h"], ["是均匀的", "v"], ["。", ""]],
+    "tip": "uniform = 处处相同。溶液里溶质均匀分散，各处的浓度都相同。",
+},
+
+"contain": {
+    "pat": "主谓宾 + 分词后置定语",
+    "flow": [["The solution", "溶液", "s"], ["contains", "含有", "v"], ["dissolved salt", "溶解的盐", "h"]],
+    "core": ["The solution contains salt", "溶液含有盐"],
+    "tree": [[0, "salt", "盐"], [1, "dissolved", "溶解的"]],
+    "final": [["溶液", "s"], ["中含有", "v"], ["溶解的盐", "h"], ["。", ""]],
+    "tip": "dissolved 是过去分词作定语修饰 salt，中文前移。contain 表「含有、容纳」，是及物动词。",
+},
+
+"separate": {
+    "pat": "主谓宾 + from 介词短语",
+    "flow": [["Filtering", "过滤", "s"], ["can separate", "能分离", "v"], ["the sand", "沙子", "h"],
+             ["from the water", "与水", "a"]],
+    "core": ["Filtering can separate the sand", "过滤能分离沙子"],
+    "final": [["过滤", "s"], ["能把", "v"], ["沙", "h"], ["和水", "a"], ["分离", "v"], ["。", ""]],
+    "tip": "separate A from B = 把 A 和 B 分离。过滤适合分离不溶性固体和液体。",
+},
+
+"among": {
+    "pat": "主谓 + among 介词短语",
+    "flow": [["The solute particles", "溶质粒子", "s"], ["spread", "散开", "v"],
+             ["among the solvent particles", "在溶剂粒子之间", "a"]],
+    "core": ["The solute particles spread", "溶质粒子散开"],
+    "final": [["溶质粒子", "s"], ["在溶剂粒子之间", "a"], ["散开", "v"], ["。", ""]],
+    "tip": "among = 在（三者及以上）之间；between 用于两者。溶解时溶质粒子挤进溶剂粒子的空隙中。",
+},
+
+"dispersed": {
+    "pat": "被动结构 + in 介词短语",
+    "flow": [["The ink", "墨水", "s"], ["is dispersed", "被分散", "v"], ["in the water", "在水中", "a"]],
+    "core": ["The ink is dispersed", "墨水被分散"],
+    "final": [["墨水", "s"], ["在水中", "a"], ["散开", "v"], ["。", ""]],
+    "tip": "dispersed = 分散的、散开的。被动语态 is dispersed 中文说成「散开」更自然。",
+},
+
+"specified": {
+    "pat": "祈使句 + of 后置定语",
+    "flow": [["Dissolve", "溶解", "v"], ["the salt", "盐", "h"], ["in the specified volume", "在规定体积里", "a"],
+             ["of water", "水的", "d"]],
+    "core": ["Dissolve the salt", "溶解盐"],
+    "tree": [[0, "the specified volume", "规定体积"], [1, "of water", "水的"]],
+    "asm": [["把盐", "h"], ["溶解", "v"], ["在", "v"], ["规定体积", "d"], ["的水中", "a"]],
+    "final": [["把盐", "h"], ["溶解", "v"], ["在", "v"], ["规定体积", "d"], ["的水中", "a"], ["。", ""]],
+    "tip": "specified = 明确指定的。祈使句开头的动作，中文用「把」字句读起来更顺。",
+},
+
+"maximum": {
+    "pat": "主谓 + 定语从句 + with 状语",
+    "flow": [["The maximum amount", "最大量", "s"], ["of solute", "溶质的", "d"],
+             ["that can dissolve", "能溶解的", "d"], ["increases", "增大", "v"], ["with temperature", "随温度", "a"]],
+    "core": ["The maximum amount increases", "最大量增大"],
+    "tree": [[0, "The maximum amount", "最大量"], [1, "of solute", "溶质的"], [2, "that can dissolve", "能溶解的"]],
+    "asm": [["能溶解的", "d"], ["溶质", "h"], ["最大量", "h"], ["随温度升高", "a"], ["而增大", "v"]],
+    "final": [["能溶解的", "d"], ["溶质", "h"], ["最大量", "h"], ["随温度升高", "a"], ["而增大", "v"], ["。", ""]],
+    "tip": "that 从句修饰 amount，中文整块前移。大多数固体溶质的溶解量随温度升高而增大。",
+},
+
+"process": {
+    "pat": "判断句（最简）",
+    "flow": [["Dissolving", "溶解", "s"], ["is", "是", "v"], ["a physical process", "一个物理过程", "h"]],
+    "core": ["Dissolving is a physical process", "溶解是物理过程"],
+    "final": [["溶解", "s"], ["是", "v"], ["一个物理过程", "h"], ["。", ""]],
+    "tip": "process = 过程。物理过程不生成新物质，化学过程会生成新物质。",
+},
+
+"disappear": {
+    "pat": "主谓 + when 时间状语从句",
+    "flow": [["The colour", "颜色", "s"], ["disappears", "消失", "v"],
+             ["when the two solutions are mixed", "在两种溶液混合时", "c"]],
+    "core": ["The colour disappears", "颜色消失"],
+    "asm": [["两种溶液混合后", "c"], ["，", ""], ["颜色", "s"], ["消失了", "v"]],
+    "final": [["两种溶液混合后", "c"], ["，", ""], ["颜色", "s"], ["消失了", "v"], ["。", ""]],
+    "tip": "when 从句表时间，中文提到句首。颜色变化是判断化学变化是否发生的重要证据。",
+},
+
+"gravitational potential": {
+    "pat": "主谓 + of 后置定语 + with 状语",
+    "flow": [["The gravitational potential", "重力势能", "s"], ["of an object", "物体的", "d"],
+             ["increases", "增大", "v"], ["with height", "随高度", "a"]],
+    "core": ["The gravitational potential increases", "重力势能增大"],
+    "tree": [[0, "The gravitational potential", "重力势能"], [1, "of an object", "物体的"]],
+    "asm": [["物体的", "d"], ["重力势能", "s"], ["随高度增加", "a"], ["而增大", "v"]],
+    "final": [["物体的", "d"], ["重力势能", "s"], ["随高度增加", "a"], ["而增大", "v"], ["。", ""]],
+    "tip": "of an object 是后置定语，中文提前。物体被举得越高，重力势能越大。",
+},
+
 "aqueous": {
     "pat": "主谓宾 + 分词后置定语",
     "flow": [["NaCl(aq)", "NaCl(aq)", "s"], ["means", "表示", "v"],
