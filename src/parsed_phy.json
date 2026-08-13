@@ -1037,6 +1037,90 @@
      "exzh": "使用相等间隔。"
     }
    ]
+  },
+  {
+   "cn": "常用单词",
+   "en": "Common words",
+   "items": [
+    {
+     "w": "something",
+     "zh": "某物；某种东西",
+     "ex": "Time is something we measure.",
+     "exzh": "时间是我们测量的一种东西。"
+    },
+    {
+     "w": "measured",
+     "zh": "被测量的",
+     "ex": "The length was measured several times.",
+     "exzh": "长度被测量了好几次。"
+    },
+    {
+     "w": "several times",
+     "zh": "几次；多次",
+     "ex": "Repeat the measurement several times.",
+     "exzh": "重复测量几次。"
+    },
+    {
+     "w": "stopwatch",
+     "zh": "秒表",
+     "ex": "Use a stopwatch to measure time.",
+     "exzh": "使用秒表来测量时间。"
+    },
+    {
+     "w": "metre",
+     "zh": "米（长度单位）",
+     "ex": "The metre is a unit of length.",
+     "exzh": "米是长度的单位。"
+    },
+    {
+     "w": "volt",
+     "zh": "伏特（电压单位）",
+     "ex": "Voltage is measured in volts.",
+     "exzh": "电压以伏特为单位测量。"
+    },
+    {
+     "w": "express",
+     "zh": "表达；表示",
+     "ex": "Express your answer in metres.",
+     "exzh": "用米表示你的答案。"
+    },
+    {
+     "w": "common",
+     "zh": "常见的；共同的",
+     "ex": "Copper is a common conductor.",
+     "exzh": "铜是一种常见的导体。"
+    },
+    {
+     "w": "automatically",
+     "zh": "自动地",
+     "ex": "The data is recorded automatically.",
+     "exzh": "数据被自动记录。"
+    },
+    {
+     "w": "directly",
+     "zh": "直接地",
+     "ex": "Read the scale directly from above.",
+     "exzh": "从正上方直接读刻度。"
+    },
+    {
+     "w": "avoid",
+     "zh": "避免",
+     "ex": "Read from above to avoid parallax.",
+     "exzh": "从正上方读数以避免视差。"
+    },
+    {
+     "w": "instrument",
+     "zh": "仪器；工具",
+     "ex": "A ruler is a measuring instrument.",
+     "exzh": "尺子是一种测量仪器。"
+    },
+    {
+     "w": "measure",
+     "zh": "测量",
+     "ex": "Measure the length with a ruler.",
+     "exzh": "用尺子测量长度。"
+    }
+   ]
   }
  ]
 }

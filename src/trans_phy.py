@@ -1368,4 +1368,111 @@ TRANS_PHY = {
     "tip": "读数间隔取相等（如每 10℃ 记一次），作图更方便。",
 },
 
+"measure": {
+    "pat": "祈使句：动词 + 宾语 + 方式状语",
+    "flow": [["Measure", "测量", "v"], ["the length", "长度", "h"], ["with a ruler", "用尺子", "a"]],
+    "core": ["Measure the length", "测量长度"],
+    "final": [["用尺子", "a"], ["测量", "v"], ["长度", "h"], ["。", ""]],
+    "tip": "measure = 测量；with + 工具表「用……测」，中文把工具提前。",
+},
+
+"something": {
+    "pat": "判断句：主语 + 谓语 + 表语",
+    "flow": [["Time", "时间", "s"], ["is", "是", "v"], ["something", "某种东西", "h"],
+             ["we measure", "我们测量的", "d"]],
+    "core": ["Time is something", "时间是某种东西"],
+    "tree": [[0, "something", "某种东西"], [1, "we measure", "我们测量的"]],
+    "asm": [["我们测量的", "d"], ["东西", "h"]],
+    "final": [["时间", "s"], ["是", "v"], ["我们测量的", "d"], ["一种东西", "h"], ["。", ""]],
+    "tip": "something 是不定代词，泛指「某物」，后面常跟定语从句 we measure 来限定。",
+},
+
+"measured": {
+    "pat": "被动语态：主语 + be + 过去分词 + 状语",
+    "flow": [["The length", "长度", "s"], ["was measured", "被测量", "v"], ["several times", "好几次", "a"]],
+    "core": ["The length was measured", "长度被测量"],
+    "final": [["长度", "s"], ["被测量了", "v"], ["好几次", "a"], ["。", ""]],
+    "tip": "measured 是过去分词表被动；was measured = 被测量，中文用「被……了」顺出来。",
+},
+
+"several times": {
+    "pat": "祈使句：动词 + 宾语 + 状语",
+    "flow": [["Repeat", "重复", "v"], ["the measurement", "测量", "h"], ["several times", "好几次", "a"]],
+    "core": ["Repeat the measurement", "重复测量"],
+    "final": [["重复", "v"], ["测量", "h"], ["几次", "a"], ["。", ""]],
+    "tip": "several times = 几次、多次；实验要求重复多次取平均值，提高可靠性。",
+},
+
+"stopwatch": {
+    "pat": "祈使句：动词 + 宾语 + 目的状语",
+    "flow": [["Use", "使用", "v"], ["a stopwatch", "秒表", "h"], ["to measure time", "来测量时间", "a"]],
+    "core": ["Use a stopwatch", "使用秒表"],
+    "final": [["使用", "v"], ["秒表", "h"], ["来测量时间", "a"], ["。", ""]],
+    "tip": "to measure time 是目的状语，中文用「来……」。秒表专测时间间隔。",
+},
+
+"metre": {
+    "pat": "判断句：主语 + 谓语 + 表语",
+    "flow": [["The metre", "米", "s"], ["is", "是", "v"], ["a unit of length", "长度的单位", "h"]],
+    "core": ["The metre is a unit of length", "米是长度单位"],
+    "final": [["米", "s"], ["是", "v"], ["长度的单位", "h"], ["。", ""]],
+    "tip": "metre 是英式拼法，美式写 meter；符号 m，长度的国际单位。",
+},
+
+"volt": {
+    "pat": "被动语态 + in 状语",
+    "flow": [["Voltage", "电压", "s"], ["is measured", "被测量", "v"], ["in volts", "以伏特为单位", "a"]],
+    "core": ["Voltage is measured", "电压被测量"],
+    "final": [["电压", "s"], ["以", "a"], ["伏特", "a"], ["为单位测量", "v"], ["。", ""]],
+    "tip": "in volts = 以伏特计；in + 单位表「用……为单位」，是测量类句型的高频搭配。",
+},
+
+"express": {
+    "pat": "祈使句：动词 + 宾语 + 方式状语",
+    "flow": [["Express", "表达", "v"], ["your answer", "你的答案", "h"], ["in metres", "用米", "a"]],
+    "core": ["Express your answer", "表达你的答案"],
+    "final": [["用", "a"], ["米", "a"], ["表示", "v"], ["你的答案", "h"], ["。", ""]],
+    "tip": "express A in B = 用 B 来表示 A；答题时先看清要求的单位再作答。",
+},
+
+"common": {
+    "pat": "主谓宾：主语 + 谓语 + 宾语",
+    "flow": [["Copper", "铜", "s"], ["is", "是", "v"], ["a common conductor", "一种常见的导体", "h"]],
+    "core": ["Copper is a common conductor", "铜是常见的导体"],
+    "final": [["铜", "s"], ["是", "v"], ["一种常见的导体", "h"], ["。", ""]],
+    "tip": "common = 常见的；作定语修饰 conductor，中文放中心词前加「的」。",
+},
+
+"automatically": {
+    "pat": "被动语态：主语 + be + 过去分词 + 副词",
+    "flow": [["The data", "数据", "s"], ["is recorded", "被记录", "v"], ["automatically", "自动地", "a"]],
+    "core": ["The data is recorded", "数据被记录"],
+    "final": [["数据", "s"], ["被", "v"], ["自动", "a"], ["记录", "v"], ["。", ""]],
+    "tip": "automatically = 自动地；数据采集器（data logger）能自动记录读数，比人工更快更准。",
+},
+
+"directly": {
+    "pat": "祈使句：动词 + 宾语 + 方式状语",
+    "flow": [["Read", "读", "v"], ["the scale", "刻度", "h"], ["directly", "直接地", "a"], ["from above", "从正上方", "a"]],
+    "core": ["Read the scale", "读刻度"],
+    "final": [["从", "a"], ["正上方", "a"], ["直接", "a"], ["读", "v"], ["刻度", "h"], ["。", ""]],
+    "tip": "directly = 直接地；read directly from above 是避免视差的标准动作。",
+},
+
+"avoid": {
+    "pat": "祈使句：动词 + 宾语 + 目的状语",
+    "flow": [["Read from above", "从正上方读", "v"], ["to avoid", "以避免", "a"], ["parallax", "视差", "h"]],
+    "core": ["Read to avoid parallax", "读数以避免视差"],
+    "final": [["从正上方读数", "v"], ["以", "a"], ["避免", "a"], ["视差", "h"], ["。", ""]],
+    "tip": "avoid = 避免；to avoid 表目的。视差是斜看刻度造成的读数误差，正对刻度可避免。",
+},
+
+"instrument": {
+    "pat": "判断句：主语 + 谓语 + 表语",
+    "flow": [["A ruler", "尺子", "s"], ["is", "是", "v"], ["a measuring instrument", "一种测量仪器", "h"]],
+    "core": ["A ruler is a measuring instrument", "尺子是测量仪器"],
+    "final": [["尺子", "s"], ["是", "v"], ["一种", "d"], ["测量仪器", "h"], ["。", ""]],
+    "tip": "instrument = 仪器；measuring instrument 是「测量仪器」的统称，含尺子、秒表、电压表等。",
+},
+
 }
