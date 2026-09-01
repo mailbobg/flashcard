@@ -1438,7 +1438,8 @@ function feedback(w, ok, d) {
   let h = `<div class="card fb">
     <div class="tag ${ok ? 'ok' : 'no'}">${ok ? '<svg class="qtick" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg>正确' : '✗ 不对'}
       <span style="color:var(--color-text-disabled);font-weight:400">· ${gradeText}</span>`
-    + (ok && streak >= 3 ? ` <span class="streak${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span>` : '')
+    // 反馈卡每题只插入一次，不存在 paintPg 那种重绘重放的问题，所以一直带 pop
+    + (ok && streak >= 3 ? ` <span class="streak pop${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span>` : '')
     + `</div>
     <div class="ans">${d ? d.cor : esc(w.w)}</div>`;
   if (d) h += `<div class="yours">你写的：${d.you}</div>`;
