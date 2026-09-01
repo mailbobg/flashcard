@@ -653,6 +653,55 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{text-align:center;color:var(--color-text-disabled);font-size:var(--font-size-base);padding:48px 0}
 .credit{text-align:center;margin:var(--spacing-5) 0 var(--spacing-2);font-size:var(--font-size-xs);color:var(--color-text-disabled)}
+
+/* ---------- 测试 ---------- */
+.quiz{position:fixed;inset:0;background:var(--color-background-body);z-index:60;display:none;flex-direction:column}
+.quiz.on{display:flex}
+.qbar{display:flex;align-items:center;gap:var(--spacing-3);padding:calc(var(--safe-t) + 14px) var(--spacing-5) var(--spacing-2)}
+.qbar .track{flex:1;height:4px;border-radius:var(--radius-full);background:var(--color-track);overflow:hidden}
+.qbar .track i{display:block;height:100%;background:var(--color-accent);border-radius:var(--radius-full);transition:width var(--duration-medium) var(--ease-standard)}
+.qbar .pg{font-size:var(--font-size-sm);color:var(--color-text-secondary);font-variant-numeric:tabular-nums}
+/* 按钮放在可滚动正文里，不做固定底栏——iOS 键盘弹起时只缩视觉视口不缩布局视口，
+   固定底栏会躲到键盘后面点不到 */
+.qbody{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;
+  padding:var(--spacing-4) var(--spacing-5) calc(var(--safe-b) + var(--spacing-6))}
+.qact{margin-top:var(--spacing-4)}
+
+.qtype{display:inline-flex;align-items:center;gap:5px;align-self:flex-start;
+  padding:4px 10px;border-radius:var(--radius-full);background:var(--color-accent-muted);
+  font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);color:var(--color-text-secondary)}
+.qsec{font-size:var(--font-size-xs);color:var(--color-text-disabled);margin-top:6px}
+.qprompt{margin-top:var(--spacing-4)}
+.qprompt .zh{font-size:var(--font-size-3xl);font-weight:var(--font-weight-semibold);line-height:1.25;letter-spacing:-.01em}
+.qprompt .en{font-size:var(--font-size-3xl);font-weight:var(--font-weight-semibold);letter-spacing:-.01em}
+.qprompt .ipa{font-size:var(--font-size-base);color:var(--color-text-secondary);margin-top:4px}
+.qzh{text-align:center;font-size:var(--font-size-base);color:var(--color-text-disabled);margin-top:10px}
+
+.bigspk{width:96px;height:96px;border-radius:var(--radius-full);border:0;margin:var(--spacing-5) auto var(--spacing-2);
+  background:var(--color-accent);color:var(--color-on-accent);display:flex;align-items:center;justify-content:center;
+  transition:transform var(--duration-fast) var(--ease-standard)}
+.bigspk:active{transform:scale(.94)}
+.bigspk svg{width:40px;height:40px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.bigspk-t{text-align:center;font-size:var(--font-size-sm);color:var(--color-text-secondary)}
+
+.qin{width:100%;margin-top:var(--spacing-5);padding:15px var(--spacing-4);border-radius:var(--radius-element);
+  border:var(--border-width) solid var(--color-border-emphasized);background:var(--color-background-card);
+  font-family:inherit;font-size:var(--font-size-xl);color:var(--color-text-primary);text-align:center}
+.qin:focus{outline:none;border-color:var(--color-accent)}
+.qin.ok{border-color:var(--color-success)}
+.qin.no{border-color:var(--color-error)}
+.qhint{margin-top:10px;text-align:center;font-size:var(--font-size-xl);letter-spacing:.22em;
+  color:var(--color-text-disabled);font-variant-numeric:tabular-nums;min-height:26px}
+.qrow{display:flex;gap:8px;margin-top:var(--spacing-3)}
+.qrow .btn{flex:1}
+
+.opt{width:100%;margin-top:var(--spacing-2);padding:15px var(--spacing-4);text-align:left;
+  font-family:inherit;font-size:var(--font-size-lg);color:inherit;
+  transition:transform var(--duration-fast) var(--ease-standard)}
+.opt:active{transform:scale(.985)}
+.opt.ok{border-color:var(--color-success);background:var(--color-success-muted)}
+.opt.no{border-color:var(--color-error);background:var(--color-error-muted)}
+.opt .k{display:inline-block;width:22px;color:var(--color-text-disabled);font-weight:var(--font-weight-semibold)}
 </style>
 </head>
 <body>
@@ -701,6 +750,14 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
     </div>
     <div class="actcap"><span>本轮再出现</span><span>10 分钟后</span><span>拉长间隔</span></div>
   </div>
+</div>
+<div class="quiz" id="quiz">
+  <div class="qbar">
+    <button class="iconbtn" id="qClose"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="track"><i id="qProg" style="width:0%"></i></div>
+    <div class="pg" id="qPg">0/0</div>
+  </div>
+  <div class="qbody" id="qBody"></div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -1203,17 +1260,119 @@ function quizType(w) {
   return box <= 1 ? 'mc' : box <= 3 ? 'spell' : 'dict';
 }
 
+/* ===================== 测试流程 ===================== */
+const ROUND_N = 10;                       // 拼写要手打，10 题约 2-3 分钟，适合碎片时间
+let POOL = [], POOLI = 0, ROUND = 0;
+let QZ = [], qzi = 0, wrong = [], t0 = 0, answered = false, hinted = false;
+let streak = 0, best = 0;
+
+const TYPE_CN = { mc: '辨义 · 英译中', spell: '拼写 · 中译英', dict: '听写 · 听音拼写' };
+
+function startQuiz(pool) {
+  if (!pool || !pool.length) { toast('没有可测的词'); return; }
+  POOL = shuffle(pool.slice()); POOLI = 0; ROUND = 0;
+  $('quiz').classList.add('on');
+  loadRound();
+}
+function loadRound() {
+  ROUND++;
+  QZ = POOL.slice(POOLI, POOLI + ROUND_N);
+  if (!QZ.length) { POOL = shuffle(POOL); POOLI = 0; ROUND = 1; QZ = POOL.slice(0, ROUND_N); }
+  qzi = 0; wrong = []; streak = 0; best = 0; t0 = Date.now();
+  drawQ();
+}
+$('qClose').onclick = () => {
+  stopSpeak();
+  $('quiz').classList.remove('on');
+  document.body.classList.remove('typing');
+  render();                               // 测试改了进度，回去要刷新词表/学习页
+};
+
+/* 顶栏的连对徽章。答题前后都要重画，否则会慢一拍 */
+function paintPg() {
+  $('qPg').innerHTML = (streak >= 2
+      ? `<span class="streak${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span> ` : '')
+    + `${qzi + 1}/${QZ.length}`;
+}
+
+function drawQ() {
+  answered = false; hinted = false;
+  const w = QZ[qzi], t = quizType(w);
+  paintPg();
+  $('qProg').style.width = (qzi / QZ.length * 100) + '%';
+  let h = `<span class="qtype">${TYPE_CN[t]}</span><div class="qsec">${esc(w.secName)}</div>`;
+
+  if (t === 'mc') {
+    const opts = shuffle([w.zh, ...distractors(w)]);
+    h += `<div class="qprompt"><div class="en">${esc(w.w)}</div><div class="ipa">${esc(w.ipa)}</div></div>
+      <div style="margin-top:18px">`
+      + opts.map((o, i) => `<button class="card opt" data-opt="${esc(o)}">
+          <span class="k">${'ABCD'[i]}</span>${esc(o)}</button>`).join('')
+      + `</div>`;
+    $('qBody').innerHTML = h;
+    document.body.classList.remove('typing');      // 辨义题没有输入框
+    say(w.w);
+    $('qBody').querySelectorAll('.opt').forEach(b => b.onclick = () => pickMC(b, w));
+  } else {
+    const isDict = t === 'dict';
+    h += isDict
+      ? `<button class="bigspk" id="bigSpk">${IC.spk}</button>
+         <div class="bigspk-t">点喇叭重听</div>
+         <div class="qzh">${esc(w.zh)}</div>`
+      : `<div class="qprompt"><div class="zh">${esc(w.zh)}</div></div>`;
+    h += `<input class="qin" id="qIn" placeholder="${isDict ? '输入你听到的词' : '输入英文'}"
+            autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"
+            enterkeyhint="done">
+          <div class="qhint" id="qHint"></div>
+          <div class="qrow">
+            <button class="btn line" id="bHint">首字母提示</button>
+            <button class="btn line" id="bSay">${IC.spk} 听发音</button>
+          </div>
+          <div class="qact"><button class="btn pri blk" id="bSubmit">提交</button></div>`;
+    $('qBody').innerHTML = h;
+    if (isDict) { say(w.w); $('bigSpk').onclick = () => say(w.w); }
+    const inp = $('qIn'); inp.focus();
+    document.body.classList.add('typing');
+    inp.onfocus = () => document.body.classList.add('typing');
+    inp.onblur  = () => document.body.classList.remove('typing');
+    inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); submit(w); } };
+    $('bSubmit').onclick = () => submit(w);
+    $('bSay').onclick = () => say(w.w);
+    $('bHint').onclick = () => {
+      hinted = true;
+      $('qHint').textContent = w.w.split(' ')
+        .map(p => p[0] + '_'.repeat(Math.max(0, p.length - 1))).join('  ');
+    };
+  }
+}
+
+// pickMC 与 submit 是下一任务（作答判分）的活，这里先留空壳让出题能跑通
+function pickMC(btn, w) { }
+function submit(w) { }
+
 /* ---------- 词表 ---------- */
 let q = '';
+
+/* 测试范围＝词表页当前筛选出的这批词。有关键词时跨科，与列表显示的口径一致 */
+function quizPool() {
+  const kw = q.trim().toLowerCase();
+  const hit = w => !kw || w.w.toLowerCase().includes(kw) || w.zh.includes(kw);
+  const books = kw ? [curBook(), ...DATA.books.filter(b => b.id !== S.set.book)] : [curBook()];
+  return books.flatMap(bk => bk.words.filter(hit));
+}
+
 function renderList() {
+  const pool = quizPool();
   view.innerHTML = `
     ${bookBarHTML()}
-    <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="btn pri blk" id="goQuiz" style="margin-top:12px">测试这 ${pool.length} 个词 →</button>
+    <div style="display:flex;gap:8px;margin-top:8px">
       <input class="search" id="q" placeholder="搜索单词或中文…" value="${esc(q)}">
       <button class="btn ${S.set.maskZh ? 'pri' : 'line'}" id="mask" style="flex:0 0 auto">${S.set.maskZh ? '显示' : '遮住'}中文</button>
     </div>
     <div id="rows"></div>`;
   bindBookBar();
+  $('goQuiz').onclick = () => startQuiz(quizPool());
   const rows = $('rows');
   const draw = () => {
     const kw = q.trim().toLowerCase();
@@ -1246,7 +1405,10 @@ function renderList() {
     rows.innerHTML = h || '<div class="empty">没有匹配的词</div>';
   };
   draw();
-  $('q').oninput = e => { q = e.target.value; draw(); };
+  $('q').oninput = e => {
+    q = e.target.value; draw();
+    $('goQuiz').textContent = `测试这 ${quizPool().length} 个词 →`;
+  };
   $('mask').onclick = () => { S.set.maskZh = !S.set.maskZh; save(); renderList(); };
   rows.onclick = e => {
     const s = e.target.closest('[data-say]');
