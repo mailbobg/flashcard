@@ -502,10 +502,11 @@ $('qClose').onclick = () => {
   render();                               // 测试改了进度，回去要刷新词表/学习页
 };
 
-/* 顶栏的连对徽章。答题前后都要重画，否则会慢一拍 */
-function paintPg() {
+/* 顶栏的连对徽章。答题前后都要重画，否则会慢一拍。
+   pop 只在连对数真的增加时传 true——每题重绘都弹一次会很吵 */
+function paintPg(pop) {
   $('qPg').innerHTML = (streak >= 2
-      ? `<span class="streak${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span> ` : '')
+      ? `<span class="streak${streak >= 5 ? ' hot' : ''}${pop ? ' pop' : ''}">连对 ${streak}</span> ` : '')
     + `${qzi + 1}/${QZ.length}`;
 }
 
@@ -730,7 +731,7 @@ function score(w, ok) {
   if (ok) { streak++; best = Math.max(best, streak); sfxOK(streak); }
   else    { streak = 0; sfxNo(); }
   grade(w.id, ok ? (hinted ? 1 : 2) : 0);
-  paintPg();
+  paintPg(ok);                              // 只有答对涨了连对才弹徽章
 }
 
 function pickMC(btn, w) {
@@ -918,7 +919,7 @@ Expected: FAIL —— `{"彩纸函数":"undefined","有streak样式":false}`
 @keyframes draw{to{stroke-dashoffset:0}}
 .qtick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
 .qtick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round;
-  stroke-dasharray:26;stroke-dashoffset:26;animation:draw .32s .05s var(--ease-standard) forwards}
+  stroke-dasharray:20;stroke-dashoffset:20;animation:draw .32s .05s var(--ease-standard) forwards}
 @keyframes shake{15%{transform:translateX(-5px)}30%{transform:translateX(5px)}45%{transform:translateX(-4px)}
   60%{transform:translateX(4px)}80%{transform:translateX(-2px)}100%{transform:translateX(0)}}
 .qin.no{animation:shake .38s var(--ease-standard)}
@@ -927,7 +928,10 @@ Expected: FAIL —— `{"彩纸函数":"undefined","有streak样式":false}`
 .streak{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--radius-full);
   background:var(--color-warning-muted);color:var(--color-text-yellow);
   font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);
-  font-variant-numeric:tabular-nums;animation:streakPop .28s var(--ease-standard) both}
+  font-variant-numeric:tabular-nums}
+/* 只在连对数真的增加时才弹一下。paintPg 每题重绘都会重建这个元素，
+   把动画挂在 .streak 上会让它每题都无谓地弹一次 */
+.streak.pop{animation:streakPop .28s var(--ease-standard) both}
 .streak.hot{background:var(--color-success-muted);color:var(--color-text-green)}
 
 /* 满分彩纸：14 个小方块，纯 CSS，900ms 后自己消失 */
@@ -938,7 +942,8 @@ Expected: FAIL —— `{"彩纸函数":"undefined","有streak样式":false}`
   100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}}
 
 @media (prefers-reduced-motion: reduce){
-  .fb,.streak,.qin.no,.confetti i{animation:none}
+  /* 用 .streak.pop 而不是 .streak —— 后者权重更低，压不住 .streak.pop */
+  .fb,.streak.pop,.qin.no,.confetti i{animation:none}
   .qtick path{animation:none;stroke-dashoffset:0}
   .confetti{display:none}
 }
@@ -1492,6 +1497,23 @@ JSON.stringify(r)
 Expected：`范围一致:true`、`搜索后入口` 的数字明显小于全量、
 `三种题型` 三个都在、`归一化:true`、`干扰项无重叠:true`、
 `进度联动:true`、`关闭后回词表:true`
+
+**连对徽章不乱弹验收**：答对涨连对时徽章带 `.pop`，点「下一题」重绘后同一个连对数
+不再带 `.pop`：
+
+```js
+S.set.quizLock='spell'; document.querySelector('[data-t=list]').click();
+document.getElementById('goQuiz').click();
+const ans=()=>{document.getElementById('qIn').value=QZ[qzi].w;document.getElementById('bSubmit').click()};
+ans(); document.getElementById('bNext').click(); ans();
+const 答题后=!!document.querySelector('#qPg .streak.pop');
+document.getElementById('bNext').click();
+const 换题后=!!document.querySelector('#qPg .streak.pop');
+S.set.quizLock='';
+JSON.stringify({答题后带pop:答题后, 换题后带pop:换题后})
+```
+
+Expected: `答题后带pop:true`、`换题后带pop:false`
 
 **既有功能未被污染验收**：切到物理书 → 课前预习 → 勾上两个目标，确认勾选框仍是
 21×21、右边距 0、勾是 on-accent 白色（不是绿色）：
