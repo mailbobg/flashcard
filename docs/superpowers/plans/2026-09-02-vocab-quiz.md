@@ -478,6 +478,7 @@ const ROUND_N = 10;                       // 拼写要手打，10 题约 2-3 分
 let POOL = [], POOLI = 0, ROUND = 0;
 let QZ = [], qzi = 0, wrong = [], t0 = 0, answered = false, hinted = false;
 let streak = 0, best = 0;
+let sayTimer = null;                      // 提交后延迟朗读的 timer，换题时要清掉
 
 const TYPE_CN = { mc: '辨义 · 英译中', spell: '拼写 · 中译英', dict: '听写 · 听音拼写' };
 
@@ -509,6 +510,7 @@ function paintPg() {
 }
 
 function drawQ() {
+  clearTimeout(sayTimer);                 // 上一题的延迟朗读作废，别读到新题上
   answered = false; hinted = false;
   const w = QZ[qzi], t = quizType(w);
   paintPg();
@@ -755,7 +757,9 @@ function submit(w) {
   if (!ok) wrong.push({ w, your: v });
   score(w, ok);
   feedback(w, ok, ok ? null : diffHTML(v, w.w));
-  setTimeout(() => say(w.w), 340);            // 让音效先响完，别和朗读糊在一起
+  // 让音效先响完，别和朗读糊在一起；存 id 是因为用户可能在 340ms 内就点了「下一题」，
+  // 那时这次延迟朗读会打断新题的发音、读出上一题的词
+  sayTimer = setTimeout(() => say(w.w), 340);
 }
 
 function feedback(w, ok, d) {
@@ -787,14 +791,17 @@ function result() { }        // Task 6 补
 `IC.tick` 的 SVG 需要一个类名才能上色，把 `feedback` 里的 `IC.tick` 换成：
 
 ```js
-    <div class="tag ${ok ? 'ok' : 'no'}">${ok ? '<svg class="tick" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg>正确' : '✗ 不对'}
+    <div class="tag ${ok ? 'ok' : 'no'}">${ok ? '<svg class="qtick" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg>正确' : '✗ 不对'}
 ```
 
-并在 CSS 里加（动效在 Task 5 补，这里先给静态样式）：
+并在 CSS 里加（动效在 Task 5 补，这里先给静态样式）。
+**类名必须是 `.qtick` 不能是 `.tick`** —— `src/tpl.html:552` 已有一个 `.tick`，
+是课前预习的 21×21 勾选方框（`renderLessonDetail` 的目标与自查列表在用）。同名会把它
+改成 22px、多出 2px 右边距，且 `.tick path` 会越过 `.tick svg` 的继承把勾从白改成绿：
 
 ```css
-.tick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
-.tick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.qtick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
+.qtick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 ```
 
 - [ ] **Step 4: 构建并验证**
@@ -889,7 +896,7 @@ EOF
 
 **Interfaces:**
 - Consumes: Task 4 的 `score()` / `feedback()`、Task 3 的 `paintPg()`
-- Produces: `.streak` / `.tick` 动画、`.qin.no` 抖动、`.confetti` 彩纸；`confettiHTML(): string`
+- Produces: `.streak` / `.qtick` 动画、`.qin.no` 抖动、`.confetti` 彩纸；`confettiHTML(): string`
 
 - [ ] **Step 1: 写断言，确认它失败**
 
@@ -902,15 +909,15 @@ Expected: FAIL —— `{"彩纸函数":"undefined","有streak样式":false}`
 
 - [ ] **Step 2: 加动效 CSS**
 
-在 Task 4 的 CSS 之后插入（`.tick` 那两条规则替换成带动画的版本）：
+在 Task 4 的 CSS 之后插入（`.qtick` 那两条规则替换成带动画的版本）：
 
 ```css
 /* 奖励动效。全部受下面的 prefers-reduced-motion 兜底约束 */
 @keyframes pop{0%{transform:scale(.9);opacity:0}60%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
 .fb{animation:pop .3s var(--ease-standard) both}
 @keyframes draw{to{stroke-dashoffset:0}}
-.tick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
-.tick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round;
+.qtick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
+.qtick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round;
   stroke-dasharray:26;stroke-dashoffset:26;animation:draw .32s .05s var(--ease-standard) forwards}
 @keyframes shake{15%{transform:translateX(-5px)}30%{transform:translateX(5px)}45%{transform:translateX(-4px)}
   60%{transform:translateX(4px)}80%{transform:translateX(-2px)}100%{transform:translateX(0)}}
@@ -932,7 +939,7 @@ Expected: FAIL —— `{"彩纸函数":"undefined","有streak样式":false}`
 
 @media (prefers-reduced-motion: reduce){
   .fb,.streak,.qin.no,.confetti i{animation:none}
-  .tick path{animation:none;stroke-dashoffset:0}
+  .qtick path{animation:none;stroke-dashoffset:0}
   .confetti{display:none}
 }
 ```
@@ -1107,6 +1114,7 @@ function result() {
 ```js
 function drawQ() {
   $('qBody').onclick = null;
+  clearTimeout(sayTimer);                 // 上一题的延迟朗读作废，别读到新题上
   answered = false; hinted = false;
 ```
 
@@ -1485,13 +1493,41 @@ Expected：`范围一致:true`、`搜索后入口` 的数字明显小于全量�
 `三种题型` 三个都在、`归一化:true`、`干扰项无重叠:true`、
 `进度联动:true`、`关闭后回词表:true`
 
+**既有功能未被污染验收**：切到物理书 → 课前预习 → 勾上两个目标，确认勾选框仍是
+21×21、右边距 0、勾是 on-accent 白色（不是绿色）：
+
+```js
+S.set.book='phy'; render(); document.querySelector('[data-les]').click();
+document.querySelectorAll('.chkrow')[0].click();
+const t=document.querySelector('.tick'), cs=getComputedStyle(t);
+const p=getComputedStyle(t.querySelector('path'));
+JSON.stringify({尺寸:cs.width+'x'+cs.height, marginRight:cs.marginRight,
+  勾色:p.stroke, 描边:p.strokeWidth})
+```
+
+Expected: `21px x 21px`、`marginRight:"0px"`、`勾色` 不是绿色、`描边:"2.6px"`
+
+**换题不串音验收**：答完一题后立刻（<340ms）点「下一题」，不应听到上一题的发音。
+用 `clearTimeout` 是否被调用来验：
+
+```js
+let cleared=0; const oc=window.clearTimeout;
+window.clearTimeout=(id)=>{ if(id) cleared++; return oc(id) };
+document.getElementById('qIn').value=QZ[qzi].w; document.getElementById('bSubmit').click();
+document.getElementById('bNext').click();
+window.clearTimeout=oc;
+JSON.stringify({换题时清了timer:cleared>0})
+```
+
+Expected: `换题时清了timer:true`
+
 **键盘遮挡验收**：`resize_window {width:375, height:430}`（模拟键盘弹起），
 锁到「拼写」，截图确认「首字母提示」「听发音」「提交」三个按钮都完整可见可点。
 验完 `resize_window {preset:"mobile"}` 复位。
 
 **减弱动效验收**：无法在此环境模拟系统设置，改为静态核对
 `@media (prefers-reduced-motion: reduce)` 块里确实覆盖了
-`.fb`、`.streak`、`.qin.no`、`.confetti i`、`.tick path`、`.qlock`。
+`.fb`、`.streak`、`.qin.no`、`.confetti i`、`.qtick path`、`.qlock`。
 
 **断网验收**：`preview_stop` 停掉服务器后，直接 `open index.html`（`file://` 协议），
 确认词表、测试、朗读、翻卡都正常。
