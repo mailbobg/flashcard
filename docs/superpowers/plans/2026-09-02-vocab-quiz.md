@@ -43,6 +43,10 @@
 - 提交信息用中文，格式 `<type>: <简述>`，正文结尾必须带
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`。
 - 当前分支：先建 `feat/vocab-quiz`，**不要在 main 上直接改**。
+- **测试流程的顶层符号必须加 `qz` 前缀**：`QZ` / `qzi` / `qzNext()`。
+  裸的 `Q`、`qi`、`next` 已被「卡片学习」模块占用（`src/tpl.html:1629` 与 `:1747`），
+  同名会让整个脚本 `SyntaxError: Identifier 'Q' has already been declared` 而白屏。
+  卡片学习模块不许改（见上面「现有…卡片学习页一律不改」），所以让新代码避让。
 - 项目根的 `mockup-quiz.html` 是未入库的设计稿参考实现，**不要提交、不要删除**，
   实现时可以对照它。
 
@@ -383,7 +387,7 @@ EOF
 - Produces:
   - `startQuiz(pool: 词条[]): void` —— 开始测试
   - `drawQ(): void` —— 渲染当前题
-  - 模块级状态 `POOL / POOLI / ROUND / Q / qi / wrong / t0 / answered / hinted / streak / best`
+  - 模块级状态 `POOL / POOLI / ROUND / QZ / qzi / wrong / t0 / answered / hinted / streak / best`
 
 - [ ] **Step 1: 写断言，确认它失败**
 
@@ -472,7 +476,7 @@ Expected: FAIL —— `{"入口":false,"覆盖层":false}`
 /* ===================== 测试流程 ===================== */
 const ROUND_N = 10;                       // 拼写要手打，10 题约 2-3 分钟，适合碎片时间
 let POOL = [], POOLI = 0, ROUND = 0;
-let Q = [], qi = 0, wrong = [], t0 = 0, answered = false, hinted = false;
+let QZ = [], qzi = 0, wrong = [], t0 = 0, answered = false, hinted = false;
 let streak = 0, best = 0;
 
 const TYPE_CN = { mc: '辨义 · 英译中', spell: '拼写 · 中译英', dict: '听写 · 听音拼写' };
@@ -485,9 +489,9 @@ function startQuiz(pool) {
 }
 function loadRound() {
   ROUND++;
-  Q = POOL.slice(POOLI, POOLI + ROUND_N);
-  if (!Q.length) { POOL = shuffle(POOL); POOLI = 0; ROUND = 1; Q = POOL.slice(0, ROUND_N); }
-  qi = 0; wrong = []; streak = 0; best = 0; t0 = Date.now();
+  QZ = POOL.slice(POOLI, POOLI + ROUND_N);
+  if (!QZ.length) { POOL = shuffle(POOL); POOLI = 0; ROUND = 1; QZ = POOL.slice(0, ROUND_N); }
+  qzi = 0; wrong = []; streak = 0; best = 0; t0 = Date.now();
   drawQ();
 }
 $('qClose').onclick = () => {
@@ -501,14 +505,14 @@ $('qClose').onclick = () => {
 function paintPg() {
   $('qPg').innerHTML = (streak >= 2
       ? `<span class="streak${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span> ` : '')
-    + `${qi + 1}/${Q.length}`;
+    + `${qzi + 1}/${QZ.length}`;
 }
 
 function drawQ() {
   answered = false; hinted = false;
-  const w = Q[qi], t = quizType(w);
+  const w = QZ[qzi], t = quizType(w);
   paintPg();
-  $('qProg').style.width = (qi / Q.length * 100) + '%';
+  $('qProg').style.width = (qzi / QZ.length * 100) + '%';
   let h = `<span class="qtype">${TYPE_CN[t]}</span><div class="qsec">${esc(w.secName)}</div>`;
 
   if (t === 'mc') {
@@ -621,18 +625,18 @@ r.范围 = quizPool().length;
 S.set.quizLock = 'mc';
 document.getElementById('goQuiz').click();
 r.覆盖层打开 = document.getElementById('quiz').classList.contains('on');
-r.本轮题数 = Q.length;
+r.本轮题数 = QZ.length;
 r.辨义 = { 题型标签: document.querySelector('.qtype').textContent,
   选项数: document.querySelectorAll('.opt').length,
-  选项含答案: [...document.querySelectorAll('.opt')].some(b => b.dataset.opt === Q[0].zh) };
+  选项含答案: [...document.querySelectorAll('.opt')].some(b => b.dataset.opt === QZ[0].zh) };
 
 S.set.quizLock = 'spell'; drawQ();
 r.拼写 = { 有输入框: !!document.getElementById('qIn'), 有提交: !!document.getElementById('bSubmit'),
-  题面是中文: document.querySelector('.qprompt .zh').textContent === Q[0].zh };
+  题面是中文: document.querySelector('.qprompt .zh').textContent === QZ[0].zh };
 
 S.set.quizLock = 'dict'; drawQ();
 r.听写 = { 有喇叭: !!document.getElementById('bigSpk'),
-  有中文兜底: document.querySelector('.qzh').textContent === Q[0].zh,
+  有中文兜底: document.querySelector('.qzh').textContent === QZ[0].zh,
   无题面: !document.querySelector('.qprompt') };
 
 document.getElementById('bHint').click();
@@ -676,7 +680,7 @@ EOF
 
 **Interfaces:**
 - Consumes: Task 2 的 `normAns` / `diffHTML`、现有的 `grade(id, g)` / `rec(id)` / `say()`
-- Produces: `pickMC(btn, w)`、`submit(w)`、`feedback(w, ok, d)`、`next()`
+- Produces: `pickMC(btn, w)`、`submit(w)`、`feedback(w, ok, d)`、`qzNext()`
 
 - [ ] **Step 1: 写断言，确认它失败**
 
@@ -684,7 +688,7 @@ EOF
 S.set.quizLock = 'spell';
 document.querySelector('[data-t=list]').click();
 document.getElementById('goQuiz').click();
-const w = Q[0];
+const w = QZ[0];
 document.getElementById('qIn').value = w.w;
 document.getElementById('bSubmit').click();
 JSON.stringify({ 有反馈卡: !!document.querySelector('.fb'),
@@ -762,16 +766,16 @@ function feedback(w, ok, d) {
   h += `<div class="zh">${esc(w.zh)} · ${esc(w.ipa)}</div>
     <div style="margin-top:12px"><button class="btn line tiny" id="fbSay">${IC.spk} 再听一次</button></div>
   </div>
-  <div class="qact"><button class="btn pri blk" id="bNext">${qi < Q.length - 1 ? '下一题' : '看结果'}</button></div>`;
+  <div class="qact"><button class="btn pri blk" id="bNext">${qzi < QZ.length - 1 ? '下一题' : '看结果'}</button></div>`;
   $('qBody').insertAdjacentHTML('beforeend', h);
   $('fbSay').onclick = () => say(w.w);
-  $('bNext').onclick = next;
+  $('bNext').onclick = qzNext;
   // 键盘可能还开着，把「下一题」滚进可见区
   $('bNext').scrollIntoView({ block: 'nearest' });
 }
 
-function next() {
-  if (qi < Q.length - 1) { qi++; drawQ(); } else result();
+function qzNext() {
+  if (qzi < QZ.length - 1) { qzi++; drawQ(); } else result();
 }
 function result() { }        // Task 6 补
 ```
@@ -804,7 +808,7 @@ document.querySelector('[data-t=list]').click();
 document.getElementById('goQuiz').click();
 
 // 答对、没用提示 → box 应升到 1
-let w = Q[0];
+let w = QZ[0];
 document.getElementById('qIn').value = w.w;
 document.getElementById('bSubmit').click();
 r.答对 = { 标签: document.querySelector('.fb .tag').textContent.replace(/\s+/g,' ').trim(),
@@ -813,7 +817,7 @@ r.答对 = { 标签: document.querySelector('.fb .tag').textContent.replace(/\s+
 
 document.getElementById('bNext').click();
 // 用提示后答对 → 只按「模糊」
-w = Q[qi];
+w = QZ[qzi];
 document.getElementById('bHint').click();
 document.getElementById('qIn').value = w.w;
 document.getElementById('bSubmit').click();
@@ -822,7 +826,7 @@ r.提示后答对 = { 标签: document.querySelector('.fb .tag').textContent.rep
 
 document.getElementById('bNext').click();
 // 答错 → box 归零、wrong 记录、diff 有标注
-w = Q[qi];
+w = QZ[qzi];
 document.getElementById('qIn').value = 'zzzwrong';
 document.getElementById('bSubmit').click();
 r.答错 = { box: S.prog[w.id].box, wrong数: wrong.length,
@@ -842,7 +846,7 @@ Expected：
 
 ```js
 S.set.quizLock = 'mc'; drawQ();
-const w = Q[qi];
+const w = QZ[qzi];
 const wrongBtn = [...document.querySelectorAll('.opt')].find(b => b.dataset.opt !== w.zh);
 wrongBtn.click();
 const r = { 选错标红: wrongBtn.classList.contains('no'),
@@ -939,7 +943,7 @@ Expected: FAIL —— `{"彩纸函数":"undefined","有streak样式":false}`
     + `</div>
 ```
 
-在 `next()` 之后加：
+在 `qzNext()` 之后加：
 
 ```js
 function confettiHTML() {
@@ -968,7 +972,7 @@ const r = {};
 S.set.quizLock = 'spell';
 document.querySelector('[data-t=list]').click();
 document.getElementById('goQuiz').click();
-const ans = () => { document.getElementById('qIn').value = Q[qi].w; document.getElementById('bSubmit').click(); };
+const ans = () => { document.getElementById('qIn').value = QZ[qzi].w; document.getElementById('bSubmit').click(); };
 const nxt = () => document.getElementById('bNext').click();
 ans(); nxt(); ans(); nxt();
 r.连对2时顶栏 = document.getElementById('qPg').innerHTML;
@@ -1049,22 +1053,22 @@ Expected: FAIL —— 三个都是 `"undefined"`
 把 `function result() { }` 替换成：
 
 ```js
-const nextRound = () => { POOLI += Q.length; loadRound(); };
+const nextRound = () => { POOLI += QZ.length; loadRound(); };
 const redoRound = () => { ROUND--; loadRound(); };      // POOLI 不动，重取同一批
-const restLeft  = () => Math.max(0, POOL.length - POOLI - Q.length);
+const restLeft  = () => Math.max(0, POOL.length - POOLI - QZ.length);
 
 function result() {
-  const right = Q.length - wrong.length, perfect = !wrong.length;
+  const right = QZ.length - wrong.length, perfect = !wrong.length;
   const sec = Math.round((Date.now() - t0) / 1000);
   const mm = String(Math.floor(sec / 60)), ss = String(sec % 60).padStart(2, '0');
-  $('qPg').textContent = `${Q.length}/${Q.length}`;
+  $('qPg').textContent = `${QZ.length}/${QZ.length}`;
   $('qProg').style.width = '100%';
   document.body.classList.remove('typing');
   sfxFinish(perfect);
   const left = restLeft();
   let h = `<div class="res">
       ${perfect ? confettiHTML() : ''}
-      <div class="big">${right}/${Q.length}</div>
+      <div class="big">${right}/${QZ.length}</div>
       <div class="sub">第 ${ROUND} 轮 · 用时 ${mm}:${ss} · 最长连对 ${best}</div>
     </div>`;
   if (wrong.length) {
@@ -1115,9 +1119,9 @@ const r = {};
 S.set.quizLock = 'spell';
 document.querySelector('[data-t=list]').click();
 document.getElementById('goQuiz').click();
-const r1 = Q.map(w => w.w);
+const r1 = QZ.map(w => w.w);
 const run = (bad) => { for (let k = 0; k < 10; k++) {
-  document.getElementById('qIn').value = (bad && k === 2) ? 'zzz' : Q[qi].w;
+  document.getElementById('qIn').value = (bad && k === 2) ? 'zzz' : QZ[qzi].w;
   document.getElementById('bSubmit').click(); document.getElementById('bNext').click(); } };
 run(true);
 r.有错题时按钮 = [...document.querySelectorAll('.qact button')].map(b => b.textContent.trim());
@@ -1125,13 +1129,13 @@ r.错题行 = document.querySelectorAll('.wrongrow').length;
 r.剩余文案 = [...document.querySelectorAll('.credit')].map(e => e.textContent.trim());
 
 document.getElementById('bRedo').click();
-r.重做取到同一批 = JSON.stringify(Q.map(w => w.w)) === JSON.stringify(r1);
+r.重做取到同一批 = JSON.stringify(QZ.map(w => w.w)) === JSON.stringify(r1);
 run(false);
 r.全对时彩纸 = document.querySelectorAll('.confetti i').length;
 r.全对时按钮 = [...document.querySelectorAll('.qact button')].map(b => b.textContent.trim());
 
 document.getElementById('bNextR').click();
-const r2 = Q.map(w => w.w);
+const r2 = QZ.map(w => w.w);
 r.下一轮零重叠 = r2.every(w => !r1.includes(w));
 r.轮次 = ROUND; r.游标 = POOLI; r.剩余 = restLeft();
 S.set.quizLock = '';
@@ -1151,12 +1155,12 @@ Expected：
 S.set.quizLock = 'spell';
 document.querySelector('[data-t=list]').click();
 document.getElementById('goQuiz').click();
-for (let k = 0; k < 10; k++) { document.getElementById('qIn').value = k < 3 ? 'zzz' : Q[qi].w;
+for (let k = 0; k < 10; k++) { document.getElementById('qIn').value = k < 3 ? 'zzz' : QZ[qzi].w;
   document.getElementById('bSubmit').click(); document.getElementById('bNext').click(); }
 const before = wrong.map(x => x.w.id);
 document.getElementById('bWrong').click();
-const r = { 错题数: before.length, 新池: POOL.length, 新轮题数: Q.length,
-  只含错题: Q.every(w => before.includes(w.id)) };
+const r = { 错题数: before.length, 新池: POOL.length, 新轮题数: QZ.length,
+  只含错题: QZ.every(w => before.includes(w.id)) };
 S.set.quizLock = '';
 JSON.stringify(r)
 ```
@@ -1287,7 +1291,7 @@ document.querySelector('.qlock [data-lk=dict]').click();
 r.锁听写 = { 有喇叭: !!document.getElementById('bigSpk') };
 
 // 已作答后切题型不应重绘（否则会把反馈冲掉）
-document.getElementById('qIn').value = Q[qi].w;
+document.getElementById('qIn').value = QZ[qzi].w;
 document.getElementById('bSubmit').click();
 document.querySelector('.qlock [data-lk=spell]').click();
 r.答完后切题型保留反馈 = !!document.querySelector('.fb');
@@ -1463,7 +1467,7 @@ r.干扰项无重叠 = all.every(w => { const t = zhToks(w.zh);
 
 // 进度联动
 S.set.quizLock = 'spell'; drawQ();
-const w = Q[qi];
+const w = QZ[qzi];
 document.getElementById('qIn').value = w.w;
 document.getElementById('bSubmit').click();
 r.进度联动 = S.prog[w.id].box === 1;
