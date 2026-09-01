@@ -602,10 +602,14 @@ function quizPool() {
 }
 ```
 
-`$('q').oninput` 改成同时刷新按钮文案：
+`$('q').oninput` 改成同时刷新按钮文案。**保留原有的增量 `draw()`**，只单独改按钮文字 ——
+整页 `renderList()` 会每敲一个字就重建 356 行列表，且 `focus()` 只恢复焦点不恢复光标位置：
 
 ```js
-  $('q').oninput = e => { q = e.target.value; renderList(); $('q').focus(); };
+  $('q').oninput = e => {
+    q = e.target.value; draw();
+    $('goQuiz').textContent = `测试这 ${quizPool().length} 个词 →`;
+  };
 ```
 
 - [ ] **Step 6: 构建并验证**
