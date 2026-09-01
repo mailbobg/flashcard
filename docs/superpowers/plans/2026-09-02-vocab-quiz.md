@@ -195,14 +195,21 @@ JSON.stringify(r)
 Expected: `默认值:true`、三个函数都是 `function`、`可调用:true`、`开关存在:true`、
 `开关初始:true`、`点击后设置:false`、`点击后样式:false`、`已持久化:false`
 
-再验证关掉后不发声（`tone` 提前 return）：
+再验证关掉后**真的不发声** —— 拦截 `createOscillator` 数调用次数，而不是只看代码路径：
 
 ```js
-S.set.sfx = false;
-const before = ac() ? ac().currentTime : null;
-sfxOK(3);
-JSON.stringify({ 关闭时tone不建节点: true, 说明: '靠代码路径保证，tone 首行就 return' , ctx: !!ac() })
+const a = ac();
+const orig = a.createOscillator.bind(a);
+let n = 0; a.createOscillator = () => { n++; return orig(); };
+
+S.set.sfx = true;  n = 0; sfxOK(3); const 开 = n;
+S.set.sfx = false; n = 0; sfxOK(3); sfxNo(); sfxFinish(true); const 关 = n;
+S.set.sfx = true;
+a.createOscillator = orig;
+JSON.stringify({ 开着时建了几个振荡器: 开, 关掉后: 关 })
 ```
+
+Expected: `开着时建了几个振荡器:3`（连对 3 是三个音）、`关掉后:0`
 
 `read_console_messages {onlyErrors:true}` 应无输出。
 
