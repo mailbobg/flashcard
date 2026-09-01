@@ -955,7 +955,8 @@ Expected: FAIL —— `{"彩纸函数":"undefined","有streak样式":false}`
 
 ```js
       <span style="color:var(--color-text-disabled);font-weight:400">· ${grade}</span>`
-    + (ok && streak >= 3 ? ` <span class="streak${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span>` : '')
+    // 反馈卡每题只插入一次，不存在 paintPg 那种重绘重放的问题，所以一直带 pop
+    + (ok && streak >= 3 ? ` <span class="streak pop${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span>` : '')
     + `</div>
 ```
 
@@ -1514,6 +1515,14 @@ JSON.stringify({答题后带pop:答题后, 换题后带pop:换题后})
 ```
 
 Expected: `答题后带pop:true`、`换题后带pop:false`
+
+反馈卡里的徽章则**始终**带 `pop`（它每题只插入一次，没有重放问题）：
+
+```js
+JSON.stringify({反馈卡徽章带pop: !!document.querySelector('.fb .streak.pop')})
+```
+
+Expected: 连对 ≥3 时为 `true`
 
 **既有功能未被污染验收**：切到物理书 → 课前预习 → 勾上两个目标，确认勾选框仍是
 21×21、右边距 0、勾是 on-accent 白色（不是绿色）：
