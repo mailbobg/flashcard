@@ -1186,9 +1186,13 @@ function distractors(w) {
   const ansT = zhToks(w.zh);
   const clash = z => [...zhToks(z)].some(x => ansT.has(x));
   const bk = BOOKS[w.book];
-  const same = bk.words.filter(x => x.sec === w.sec && x.id !== w.id && !clash(x.zh));
-  const all  = bk.words.filter(x => x.id !== w.id && !clash(x.zh));
-  return shuffle((same.length >= 3 ? same : all).slice()).slice(0, 3).map(x => x.zh);
+  const pick = arr => arr.filter(x => x.id !== w.id && !clash(x.zh));
+  // 同章 → 本书 → 两本书，逐级放宽，保证凑得满 3 个
+  const same = pick(bk.words.filter(x => x.sec === w.sec));
+  const book = pick(bk.words);
+  const any  = pick(DATA.books.flatMap(b => b.words));
+  const src  = same.length >= 3 ? same : book.length >= 3 ? book : any;
+  return shuffle(src.slice()).slice(0, 3).map(x => x.zh);
 }
 
 /* 题型跟着记忆盒子升级：先认得出，再写得出，最后听得出。
