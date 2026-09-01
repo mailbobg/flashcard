@@ -702,6 +702,18 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 .opt.ok{border-color:var(--color-success);background:var(--color-success-muted)}
 .opt.no{border-color:var(--color-error);background:var(--color-error-muted)}
 .opt .k{display:inline-block;width:22px;color:var(--color-text-disabled);font-weight:var(--font-weight-semibold)}
+
+.fb{margin-top:var(--spacing-5);padding:var(--spacing-4)}
+.fb .tag{font-size:var(--font-size-base);font-weight:var(--font-weight-semibold)}
+.fb .tag.ok{color:var(--color-success)}
+.fb .tag.no{color:var(--color-error)}
+.fb .ans{font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);margin-top:8px;word-break:break-word}
+.fb .yours{font-size:var(--font-size-base);color:var(--color-text-secondary);margin-top:6px;word-break:break-word}
+.fb .zh{font-size:var(--font-size-base);color:var(--color-text-secondary);margin-top:6px}
+.fb b.bad{color:var(--color-error);background:var(--color-error-muted);border-radius:3px}
+.fb b.miss{color:var(--color-success);background:var(--color-success-muted);border-radius:3px}
+.tick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
+.tick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -1346,9 +1358,66 @@ function drawQ() {
   }
 }
 
-// pickMC 与 submit 是下一任务（作答判分）的活，这里先留空壳让出题能跑通
-function pickMC(btn, w) { }
-function submit(w) { }
+/* 测试结果就是复习结果，直接喂现有的间隔重复，不分裂成两套记录。
+   用了提示即使答对也只按「模糊」记，不给满级晋升。 */
+function score(w, ok) {
+  if (ok) { streak++; best = Math.max(best, streak); sfxOK(streak); }
+  else    { streak = 0; sfxNo(); }
+  grade(w.id, ok ? (hinted ? 1 : 2) : 0);
+  paintPg();
+}
+
+function pickMC(btn, w) {
+  if (answered) return; answered = true;
+  const ok = btn.dataset.opt === w.zh;
+  $('qBody').querySelectorAll('.opt').forEach(b => {
+    if (b.dataset.opt === w.zh) b.classList.add('ok');
+    else if (b === btn) b.classList.add('no');
+    b.onclick = null;
+  });
+  if (!ok) wrong.push({ w, your: btn.dataset.opt });
+  score(w, ok);
+  feedback(w, ok, null);
+}
+
+function submit(w) {
+  if (answered) return;
+  const v = $('qIn').value.trim();
+  if (!v) return;
+  answered = true;
+  const ok = normAns(v) === normAns(w.w);
+  $('qIn').classList.add(ok ? 'ok' : 'no');
+  $('qIn').disabled = true;
+  if (!ok) wrong.push({ w, your: v });
+  score(w, ok);
+  feedback(w, ok, ok ? null : diffHTML(v, w.w));
+  setTimeout(() => say(w.w), 340);            // 让音效先响完，别和朗读糊在一起
+}
+
+function feedback(w, ok, d) {
+  document.body.classList.remove('typing');
+  const sb = $('bSubmit'); if (sb) sb.parentElement.remove();   // 用过的提交按钮收走
+  const gradeText = !ok ? '记为「忘记」' : hinted ? '用了提示，记为「模糊」' : '记为「记得」';
+  let h = `<div class="card fb">
+    <div class="tag ${ok ? 'ok' : 'no'}">${ok ? '<svg class="tick" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg>正确' : '✗ 不对'}
+      <span style="color:var(--color-text-disabled);font-weight:400">· ${gradeText}</span></div>
+    <div class="ans">${d ? d.cor : esc(w.w)}</div>`;
+  if (d) h += `<div class="yours">你写的：${d.you}</div>`;
+  h += `<div class="zh">${esc(w.zh)} · ${esc(w.ipa)}</div>
+    <div style="margin-top:12px"><button class="btn line tiny" id="fbSay">${IC.spk} 再听一次</button></div>
+  </div>
+  <div class="qact"><button class="btn pri blk" id="bNext">${qzi < QZ.length - 1 ? '下一题' : '看结果'}</button></div>`;
+  $('qBody').insertAdjacentHTML('beforeend', h);
+  $('fbSay').onclick = () => say(w.w);
+  $('bNext').onclick = qzNext;
+  // 键盘可能还开着，把「下一题」滚进可见区
+  $('bNext').scrollIntoView({ block: 'nearest' });
+}
+
+function qzNext() {
+  if (qzi < QZ.length - 1) { qzi++; drawQ(); } else result();
+}
+function result() { }        // Task 6 补
 
 /* ---------- 词表 ---------- */
 let q = '';
