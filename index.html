@@ -1154,6 +1154,51 @@ function sfxFinish(perfect) {
   (perfect ? [0, 4, 7, 12, 16] : [0, 4, 7]).forEach((n, i) => tone(NOTE(n), i * .1, .36, .13));
 }
 
+/* ===================== 测试：判分与出题 ===================== */
+
+/* 判分前抹平大小写、空格、连字符。词库里 distance–time graph 用的是 U+2013，
+   不是 ASCII 连字符；half-life、light-year、gravitational field strength 同理。 */
+const normAns = s => s.toLowerCase().replace(/[-–—\s]/g, '');
+
+/* 字符级 LCS diff：答案里用户漏掉的标绿，用户多写/写错的标红 */
+function diffHTML(user, ans) {
+  const a = [...user], b = [...ans], n = a.length, m = b.length;
+  const L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+    L[i][j] = a[i].toLowerCase() === b[j].toLowerCase() ? L[i + 1][j + 1] + 1
+                                                        : Math.max(L[i + 1][j], L[i][j + 1]);
+  let i = 0, j = 0, you = '', cor = '';
+  while (i < n && j < m) {
+    if (a[i].toLowerCase() === b[j].toLowerCase()) { you += esc(a[i]); cor += esc(b[j]); i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) { you += '<b class="bad">' + esc(a[i]) + '</b>'; i++; }
+    else { cor += '<b class="miss">' + esc(b[j]) + '</b>'; j++; }
+  }
+  while (i < n) { you += '<b class="bad">' + esc(a[i]) + '</b>'; i++; }
+  while (j < m) { cor += '<b class="miss">' + esc(b[j]) + '</b>'; j++; }
+  return { you, cor };
+}
+
+/* 干扰项不能与答案有任何语义块重叠：voltage「电压」不能拿来干扰
+   potential difference「电势差/电压」，否则两个选项都对。 */
+const zhToks = z => new Set(z.replace(/[（(][^）)]*[）)]/g, '')
+                             .split(/[；;、\/／,，]/).map(x => x.trim()).filter(Boolean));
+function distractors(w) {
+  const ansT = zhToks(w.zh);
+  const clash = z => [...zhToks(z)].some(x => ansT.has(x));
+  const bk = BOOKS[w.book];
+  const same = bk.words.filter(x => x.sec === w.sec && x.id !== w.id && !clash(x.zh));
+  const all  = bk.words.filter(x => x.id !== w.id && !clash(x.zh));
+  return shuffle((same.length >= 3 ? same : all).slice()).slice(0, 3).map(x => x.zh);
+}
+
+/* 题型跟着记忆盒子升级：先认得出，再写得出，最后听得出。
+   S.set.quizLock 非空时锁死题型。 */
+function quizType(w) {
+  if (S.set.quizLock) return S.set.quizLock;
+  const box = S.prog[w.id]?.box || 0;
+  return box <= 1 ? 'mc' : box <= 3 ? 'spell' : 'dict';
+}
+
 /* ---------- 词表 ---------- */
 let q = '';
 function renderList() {
