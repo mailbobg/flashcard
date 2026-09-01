@@ -745,6 +745,17 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
   .qtick path{animation:none;stroke-dashoffset:0}
   .confetti{display:none}
 }
+
+/* 结果页 */
+.res{padding:var(--spacing-5) 0;position:relative}
+.res .big{text-align:center;font-size:var(--font-size-5xl);font-weight:var(--font-weight-bold);letter-spacing:-.03em}
+.res .sub{text-align:center;font-size:var(--font-size-base);color:var(--color-text-secondary);margin-top:4px}
+.wrongrow{display:flex;align-items:flex-start;gap:10px;padding:11px var(--spacing-4);border-bottom:var(--border-width) solid var(--color-border)}
+.wrongrow:last-child{border-bottom:0}
+.wrongrow .bd{flex:1;min-width:0}
+.wrongrow .w{font-weight:var(--font-weight-semibold)}
+.wrongrow .z{font-size:var(--font-size-sm);color:var(--color-text-secondary);margin-top:2px}
+.wrongrow .u{font-size:var(--font-size-sm);color:var(--color-error);margin-top:2px}
 </style>
 </head>
 <body>
@@ -1327,6 +1338,7 @@ function loadRound() {
 }
 $('qClose').onclick = () => {
   stopSpeak();
+  clearTimeout(sayTimer);                 // 关掉时把还没触发的延迟朗读也作废
   $('quiz').classList.remove('on');
   document.body.classList.remove('typing');
   render();                               // 测试改了进度，回去要刷新词表/学习页
@@ -1342,6 +1354,7 @@ function paintPg(pop) {
 }
 
 function drawQ() {
+  $('qBody').onclick = null;              // result() 挂过错题行朗读，答题页要清掉免得误触发
   clearTimeout(sayTimer);                 // 上一题的延迟朗读作废，别读到新题上
   answered = false; hinted = false;
   const w = QZ[qzi], t = quizType(w);
@@ -1457,7 +1470,49 @@ function feedback(w, ok, d) {
 function qzNext() {
   if (qzi < QZ.length - 1) { qzi++; drawQ(); } else result();
 }
-function result() { }        // Task 6 补
+const nextRound = () => { POOLI += QZ.length; loadRound(); };
+const redoRound = () => { ROUND--; loadRound(); };      // POOLI 不动，重取同一批
+const restLeft  = () => Math.max(0, POOL.length - POOLI - QZ.length);
+
+function result() {
+  clearTimeout(sayTimer);                 // 上一题的延迟朗读可能还挂着，结果页不该替它读出来
+  const right = QZ.length - wrong.length, perfect = !wrong.length;
+  const sec = Math.round((Date.now() - t0) / 1000);
+  const mm = String(Math.floor(sec / 60)), ss = String(sec % 60).padStart(2, '0');
+  $('qPg').textContent = `${QZ.length}/${QZ.length}`;
+  $('qProg').style.width = '100%';
+  document.body.classList.remove('typing');
+  sfxFinish(perfect);
+  const left = restLeft();
+  let h = `<div class="res">
+      ${perfect ? confettiHTML() : ''}
+      <div class="big">${right}/${QZ.length}</div>
+      <div class="sub">第 ${ROUND} 轮 · 用时 ${mm}:${ss} · 最长连对 ${best}</div>
+    </div>`;
+  if (wrong.length) {
+    h += `<div class="sec-t">错题 ${wrong.length}</div><div class="card">`
+      + wrong.map(x => `<div class="wrongrow">
+          <span class="iconbtn" data-say="${esc(x.w.w)}">${IC.spk}</span>
+          <div class="bd"><div class="w">${esc(x.w.w)}</div>
+            <div class="z">${esc(x.w.zh)}</div>
+            <div class="u">你的答案：${esc(x.your)}</div></div>
+        </div>`).join('') + `</div>`;
+  } else {
+    h += `<div class="credit" style="margin-top:20px">全对，这批词可以往下一档题型走了</div>`;
+  }
+  h += `<div class="credit">${left ? '这批还剩 ' + left + ' 词没测' : '这批词已经测完一遍'}</div>`;
+  h += `<div class="qact">`
+    + (wrong.length
+      ? `<div class="qrow"><button class="btn pri" id="bWrong">只练错题</button>
+         <button class="btn line" id="bNextR">${left ? '下一轮' : '再来一轮'}</button></div>`
+      : `<button class="btn pri blk" id="bNextR">${left ? '下一轮 10 题' : '再来一轮'}</button>`)
+    + `<button class="btn line blk" id="bRedo" style="margin-top:8px">重做本轮</button></div>`;
+  $('qBody').innerHTML = h;
+  $('qBody').onclick = e => { const s = e.target.closest('[data-say]'); if (s) say(s.dataset.say); };
+  $('bNextR').onclick = nextRound;
+  $('bRedo').onclick  = redoRound;
+  if (wrong.length) $('bWrong').onclick = () => startQuiz(wrong.map(x => x.w));
+}
 
 function confettiHTML() {
   const cols = ['var(--color-success)', 'var(--color-warning)', 'var(--color-brand)', 'var(--color-error)'];
