@@ -727,7 +727,7 @@ const KEY = 'igcse-flashcard-v1';
 const DEF = {
   prog: {},                       // id(<book>:<word>) -> {box, due, seen, wrong, star}
   les: {},                        // 课时 id -> {goals:[], check:[]} 勾选状态
-  set: { rate: .95, voice: '', autoSpeak: true, sylMode: 'respell', maskZh: false, theme: 'light', book: 'sci' }
+  set: { rate: .95, voice: '', autoSpeak: true, sylMode: 'respell', maskZh: false, theme: 'light', book: 'sci', sfx: true, quizLock: '' }
 };
 let S = load();
 function load() {
@@ -1117,6 +1117,43 @@ function renderHome() {
 }
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0;[a[i], a[j]] = [a[j], a[i]]; } return a; };
 
+/* ===================== 测试音效 =====================
+   用 Web Audio 现场合成，不引入任何音频文件——单文件离线是硬约束。 */
+let AC = null;
+function ac() {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+    return AC;
+  } catch (e) { return null; }
+}
+document.addEventListener('pointerdown', ac, { once: true, capture: true });   // iOS 要用户手势才解锁
+
+function tone(freq, at, dur, gain, type) {
+  if (!S.set.sfx) return;
+  const a = ac(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + at;
+  o.type = type || 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(gain, t + .014);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(a.destination);
+  o.start(t); o.stop(t + dur + .03);
+}
+const NOTE = n => 523.25 * Math.pow(2, n / 12);          // C5 起算
+/* 连对越多起始音越高、音符越多——每题都一样的奖励等于没有奖励 */
+function sfxOK(streak) {
+  const base = [0, 0, 2, 4, 5, 7][Math.min(streak, 5)];
+  tone(NOTE(base),      0,    .17, .16);
+  tone(NOTE(base + 4), .065,  .19, .14);
+  tone(NOTE(base + 7), .13,   .24, .12);
+  if (streak >= 5) tone(NOTE(base + 12), .195, .30, .10);
+}
+function sfxNo() { tone(196, 0, .15, .09, 'triangle'); tone(155, .085, .20, .08, 'triangle'); }
+function sfxFinish(perfect) {
+  (perfect ? [0, 4, 7, 12, 16] : [0, 4, 7]).forEach((n, i) => tone(NOTE(n), i * .1, .36, .13));
+}
+
 /* ---------- 词表 ---------- */
 let q = '';
 function renderList() {
@@ -1344,6 +1381,8 @@ function renderMe() {
       </select></div>
     <div class="set"><div class="lb">翻卡自动朗读<small>显示新卡片时自动读一遍</small></div>
       <button class="sw${S.set.autoSpeak ? ' on' : ''}" id="auto"><i></i></button></div>
+    <div class="set"><div class="lb">答题音效<small>测试答对答错的提示音</small></div>
+      <button class="sw${S.set.sfx ? ' on' : ''}" id="sfx"><i></i></button></div>
   </div>
   <button class="btn line blk" id="test">${IC.spk} 试听：photosynthesis</button>
 
@@ -1364,6 +1403,10 @@ function renderMe() {
   $('voice').onchange = e => { S.set.voice = e.target.value; save(); };
   $('sylMode').onchange = e => { S.set.sylMode = e.target.value; save(); };
   $('auto').onclick = e => { S.set.autoSpeak = !S.set.autoSpeak; e.currentTarget.classList.toggle('on', S.set.autoSpeak); save(); };
+  $('sfx').onclick = e => {
+    S.set.sfx = !S.set.sfx; e.currentTarget.classList.toggle('on', S.set.sfx); save();
+    if (S.set.sfx) sfxOK(1);                       // 打开时响一声，让用户听见效果
+  };
   $('test').onclick = () => {
     const w = BY_ID['sci:photosynthesis'];
     sayList([...flatSyl(w).map(sy => ({ text: sylText(sy), rate: SLOW, gap: 220 })), { text: w.w, rate: S.set.rate }]);
