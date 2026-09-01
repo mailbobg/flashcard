@@ -718,7 +718,7 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 @keyframes draw{to{stroke-dashoffset:0}}
 .qtick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
 .qtick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round;
-  stroke-dasharray:26;stroke-dashoffset:26;animation:draw .32s .05s var(--ease-standard) forwards}
+  stroke-dasharray:20;stroke-dashoffset:20;animation:draw .32s .05s var(--ease-standard) forwards}
 @keyframes shake{15%{transform:translateX(-5px)}30%{transform:translateX(5px)}45%{transform:translateX(-4px)}
   60%{transform:translateX(4px)}80%{transform:translateX(-2px)}100%{transform:translateX(0)}}
 .qin.no{animation:shake .38s var(--ease-standard)}
@@ -727,7 +727,10 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 .streak{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--radius-full);
   background:var(--color-warning-muted);color:var(--color-text-yellow);
   font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);
-  font-variant-numeric:tabular-nums;animation:streakPop .28s var(--ease-standard) both}
+  font-variant-numeric:tabular-nums}
+/* 只在连对数真的增加时才弹一下。paintPg 每题重绘都会重建这个元素，
+   把动画挂在 .streak 上会让它每题都无谓地弹一次 */
+.streak.pop{animation:streakPop .28s var(--ease-standard) both}
 .streak.hot{background:var(--color-success-muted);color:var(--color-text-green)}
 
 /* 满分彩纸：14 个小方块，纯 CSS，900ms 后自己消失 */
@@ -738,7 +741,7 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
   100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}}
 
 @media (prefers-reduced-motion: reduce){
-  .fb,.streak,.qin.no,.confetti i{animation:none}
+  .fb,.streak.pop,.qin.no,.confetti i{animation:none}
   .qtick path{animation:none;stroke-dashoffset:0}
   .confetti{display:none}
 }
@@ -1330,9 +1333,11 @@ $('qClose').onclick = () => {
 };
 
 /* 顶栏的连对徽章。答题前后都要重画，否则会慢一拍 */
-function paintPg() {
+/* 顶栏的连对徽章。答题前后都要重画，否则会慢一拍。
+   pop 只在连对数真的增加时传 true——每题重绘都弹一次会很吵 */
+function paintPg(pop) {
   $('qPg').innerHTML = (streak >= 2
-      ? `<span class="streak${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span> ` : '')
+      ? `<span class="streak${streak >= 5 ? ' hot' : ''}${pop ? ' pop' : ''}">连对 ${streak}</span> ` : '')
     + `${qzi + 1}/${QZ.length}`;
 }
 
@@ -1394,7 +1399,7 @@ function score(w, ok) {
   if (ok) { streak++; best = Math.max(best, streak); sfxOK(streak); }
   else    { streak = 0; sfxNo(); }
   grade(w.id, ok ? (hinted ? 1 : 2) : 0);
-  paintPg();
+  paintPg(ok);                              // 只有答对涨了连对才弹徽章
 }
 
 function pickMC(btn, w) {
