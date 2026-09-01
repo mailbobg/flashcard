@@ -712,8 +712,8 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 .fb .zh{font-size:var(--font-size-base);color:var(--color-text-secondary);margin-top:6px}
 .fb b.bad{color:var(--color-error);background:var(--color-error-muted);border-radius:3px}
 .fb b.miss{color:var(--color-success);background:var(--color-success-muted);border-radius:3px}
-.tick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
-.tick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.qtick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
+.qtick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -1276,6 +1276,7 @@ function quizType(w) {
 const ROUND_N = 10;                       // 拼写要手打，10 题约 2-3 分钟，适合碎片时间
 let POOL = [], POOLI = 0, ROUND = 0;
 let QZ = [], qzi = 0, wrong = [], t0 = 0, answered = false, hinted = false;
+let sayTimer = null;                      // 提交后延迟朗读的 timer，换题时要清掉
 let streak = 0, best = 0;
 
 const TYPE_CN = { mc: '辨义 · 英译中', spell: '拼写 · 中译英', dict: '听写 · 听音拼写' };
@@ -1308,6 +1309,7 @@ function paintPg() {
 }
 
 function drawQ() {
+  clearTimeout(sayTimer);                 // 上一题的延迟朗读作废，别读到新题上
   answered = false; hinted = false;
   const w = QZ[qzi], t = quizType(w);
   paintPg();
@@ -1391,7 +1393,9 @@ function submit(w) {
   if (!ok) wrong.push({ w, your: v });
   score(w, ok);
   feedback(w, ok, ok ? null : diffHTML(v, w.w));
-  setTimeout(() => say(w.w), 340);            // 让音效先响完，别和朗读糊在一起
+  // 让音效先响完，别和朗读糊在一起；存 id 是因为用户可能在 340ms 内就点了「下一题」，
+  // 那时这次延迟朗读会打断新题的发音、读出上一题的词
+  sayTimer = setTimeout(() => say(w.w), 340);
 }
 
 function feedback(w, ok, d) {
@@ -1399,7 +1403,7 @@ function feedback(w, ok, d) {
   const sb = $('bSubmit'); if (sb) sb.parentElement.remove();   // 用过的提交按钮收走
   const gradeText = !ok ? '记为「忘记」' : hinted ? '用了提示，记为「模糊」' : '记为「记得」';
   let h = `<div class="card fb">
-    <div class="tag ${ok ? 'ok' : 'no'}">${ok ? '<svg class="tick" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg>正确' : '✗ 不对'}
+    <div class="tag ${ok ? 'ok' : 'no'}">${ok ? '<svg class="qtick" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg>正确' : '✗ 不对'}
       <span style="color:var(--color-text-disabled);font-weight:400">· ${gradeText}</span></div>
     <div class="ans">${d ? d.cor : esc(w.w)}</div>`;
   if (d) h += `<div class="yours">你写的：${d.you}</div>`;
