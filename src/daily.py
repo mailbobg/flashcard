@@ -23,6 +23,16 @@
 `src/phon_daily.py` 里要有对应的音节切分与词根助记，否则构建会报错
 （`build.py` 的 STRICT_PHON 对三本书一视同仁）。这是刻意的：宁可加词时被拦下，
 也不要让一半词条没有音节、卡片上留一块空白。
+
+## 已知缺口：翻译思路
+
+另外两本书每个例句都有「翻译思路」（`trans.py` / `trans_phy.py` 里的
+pat/flow/core/final/tip 五段式），日常这本**暂时没有**——2026-09-02 明确决定先不补。
+所以日常词的卡片背面比另两本短一截，这是有意为之，不是漏了。
+
+要补的话新建 `src/trans_daily.py`，格式照 `trans.py`，然后在 `build.py` 的
+`__main__` 里加一行 `ntr += attach_trans(books['daily'], TRANS_DAILY)`。
+构建对缺失的翻译思路只打印提醒、不中断，所以可以分批补。
 """
 
 BATCHES = [
