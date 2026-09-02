@@ -1383,24 +1383,31 @@ const ROUND_N = 10;                       // 拼写要手打，10 题约 2-3 分
 let POOL = [], POOLI = 0, ROUND = 0;
 let QZ = [], qzi = 0, wrong = [], t0 = 0, answered = false, hinted = false;
 let sayTimer = null;                      // 提交后延迟朗读的 timer，换题时要清掉
+let RETRY = null;                         // 非 null＝正在「只练错题」。它是主线之外的支线，
+                                          // 不能动 POOL/POOLI，否则回不到原来的词池
 let streak = 0, best = 0;
 let retryType = null;                     // 「只练错题」时钉住失败当时的题型：{ [wordId]: type }
 let curType = '';                         // 当前题的题型，答错时记进 wrong[] 供 retryType 用
 
 const TYPE_CN = { mc: '辨义 · 英译中', spell: '拼写 · 中译英', dict: '听写 · 听音拼写' };
 
-function startQuiz(pool, types) {
+function startQuiz(pool) {
   if (!pool || !pool.length) { toast('没有可测的词'); return; }
-  retryType = types || null;              // 只有「只练错题」会传
-  POOL = shuffle(pool.slice()); POOLI = 0; ROUND = 0;
+  retryType = null;                       // 新测试一定从主线开始，清掉错题支线的题型钉住
+  POOL = shuffle(pool.slice()); POOLI = 0; ROUND = 0; RETRY = null;
   $('quiz').classList.add('on');
   bindQuizLock();
   loadRound();
 }
 function loadRound() {
   ROUND++;
-  QZ = POOL.slice(POOLI, POOLI + ROUND_N);
-  if (!QZ.length) { POOL = shuffle(POOL); POOLI = 0; QZ = POOL.slice(0, ROUND_N); }
+  if (RETRY) {
+    QZ = RETRY;                           // 错题一次做完，不按 10 题分页
+  } else {
+    QZ = POOL.slice(POOLI, POOLI + ROUND_N);
+    if (!QZ.length) { POOL = shuffle(POOL); POOLI = 0; QZ = POOL.slice(0, ROUND_N); }
+    POOLI += QZ.length;                   // 取完就推进，nextRound 不再管游标
+  }
   qzi = 0; wrong = []; streak = 0; best = 0; t0 = Date.now();
   drawQ();
 }
@@ -1551,9 +1558,20 @@ function feedback(w, ok, d) {
 function qzNext() {
   if (qzi < QZ.length - 1) { qzi++; drawQ(); } else result();
 }
-const nextRound = () => { POOLI += QZ.length; loadRound(); };
-const redoRound = () => { ROUND--; loadRound(); };      // POOLI 不动，重取同一批
-const restLeft  = () => Math.max(0, POOL.length - POOLI - QZ.length);
+/* 「下一轮」永远回到主线的下一批新词；如果刚才在错题支线上，先退出支线 */
+const nextRound = () => { RETRY = null; retryType = null; loadRound(); };
+const redoRound = () => {
+  ROUND--;
+  if (!RETRY) POOLI = Math.max(0, POOLI - QZ.length);   // 退回本轮起点，loadRound 会再推进回来
+  loadRound();
+};
+const restLeft  = () => Math.max(0, POOL.length - POOLI);
+/* 错题重练：只挂支线，绝不碰 POOL/POOLI */
+function retryWrong() {
+  retryType = Object.fromEntries(wrong.map(x => [x.w.id, x.t]));
+  RETRY = wrong.map(x => x.w);
+  loadRound();
+}
 
 function result() {
   clearTimeout(sayTimer);                 // 上一题的延迟朗读可能还挂着，结果页不该替它读出来
@@ -1568,7 +1586,7 @@ function result() {
   let h = `<div class="res">
       ${perfect ? confettiHTML() : ''}
       <div class="big">${right}/${QZ.length}</div>
-      <div class="sub">第 ${ROUND} 轮 · 用时 ${mm}:${ss} · 最长连对 ${best}</div>
+      <div class="sub">${RETRY ? '错题重练' : '第 ' + ROUND + ' 轮'} · 用时 ${mm}:${ss} · 最长连对 ${best}</div>
     </div>`;
   if (wrong.length) {
     h += `<div class="sec-t">错题 ${wrong.length}</div><div class="card">`
@@ -1583,18 +1601,22 @@ function result() {
     h += `<div class="credit" style="margin-top:20px">${S.set.quizLock ? '全对' : '全对，这批词可以往下一档题型走了'}</div>`;
   }
   h += `<div class="credit">${left ? '这批还剩 ' + left + ' 词没测' : '这批词已经测完一遍'}</div>`;
+  // 错题轮上「下一轮」要说清楚是回主线，否则用户以为还在原地打转
+  const nextLabel = RETRY ? '继续测新词' : left ? '下一轮 10 题' : '再来一轮';
   h += `<div class="qact">`
     + (wrong.length
-      ? `<div class="qrow"><button class="btn pri" id="bWrong">只练错题</button>
-         <button class="btn line" id="bNextR">${left ? '下一轮' : '再来一轮'}</button></div>`
-      : `<button class="btn pri blk" id="bNextR">${left ? '下一轮 10 题' : '再来一轮'}</button>`)
-    + `<button class="btn line blk" id="bRedo" style="margin-top:8px">重做本轮</button></div>`;
+      ? `<div class="qrow"><button class="btn pri" id="bWrong">${RETRY ? '再练一次错题' : '只练错题'}</button>
+         <button class="btn line" id="bNextR">${RETRY ? '继续测新词' : left ? '下一轮' : '再来一轮'}</button></div>`
+      : `<button class="btn pri blk" id="bNextR">${nextLabel}</button>`)
+    + (RETRY && !wrong.length
+      ? `<button class="btn line blk" id="bRedo" style="margin-top:8px">再练一次错题</button>`
+      : `<button class="btn line blk" id="bRedo" style="margin-top:8px">重做本轮</button>`)
+    + `</div>`;
   $('qBody').innerHTML = h;
   $('qBody').onclick = e => { const s = e.target.closest('[data-say]'); if (s) say(s.dataset.say); };
   $('bNextR').onclick = nextRound;
   $('bRedo').onclick  = redoRound;
-  if (wrong.length) $('bWrong').onclick = () =>
-    startQuiz(wrong.map(x => x.w), Object.fromEntries(wrong.map(x => [x.w.id, x.t])));
+  if (wrong.length) $('bWrong').onclick = retryWrong;
 }
 
 /* 结果页的彩纸与反馈卡的火花是同一套东西，只差片数与飞散距离 */
