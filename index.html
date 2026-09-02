@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no,interactive-widget=resizes-content">
 <meta name="theme-color" content="#F8F4ED">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -143,7 +143,9 @@ body::before{
     radial-gradient(90% 30% at 50% 100%, light-dark(rgba(226,164,0,.10),transparent), transparent 70%);
 }
 
-#app{height:100dvh;height:100vh;display:flex;flex-direction:column}
+/* 100vh 兜底，支持 dvh 的浏览器用 dvh —— iOS Safari 的 100vh 不含底部地址栏，
+   直接用会让底部 Tab 栏被地址栏压住 */
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column}
 .hd{
   padding:calc(var(--safe-t) + 16px) var(--spacing-5) var(--spacing-3);
   display:flex;align-items:center;gap:10px;flex:0 0 auto;
