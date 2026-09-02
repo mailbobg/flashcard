@@ -732,12 +732,24 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 .fb b.bad{color:var(--color-error);background:var(--color-error-muted);border-radius:3px}
 .fb b.miss{color:var(--color-success);background:var(--color-success-muted);border-radius:3px}
 /* 奖励动效。全部受下面的 prefers-reduced-motion 兜底约束 */
-@keyframes pop{0%{transform:scale(.9);opacity:0}60%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
-.fb{animation:pop .3s var(--ease-standard) both}
+/* 卡片从下方弹入并轻微过冲。原来只是 0.9→1 缩放，幅度太小，
+   实际使用时主观上等于「没有动画」 */
+@keyframes pop{0%{transform:translateY(16px) scale(.94);opacity:0}
+  55%{transform:translateY(-3px) scale(1.02);opacity:1}
+  100%{transform:translateY(0) scale(1);opacity:1}}
+.fb{animation:pop .42s var(--ease-standard) both;position:relative}
 @keyframes draw{to{stroke-dashoffset:0}}
-.qtick{width:22px;height:22px;vertical-align:-4px;margin-right:2px}
-.qtick path{stroke:var(--color-success);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round;
-  stroke-dasharray:20;stroke-dashoffset:20;animation:draw .32s .05s var(--ease-standard) forwards}
+@keyframes tickIn{0%{transform:scale(.4)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes ringPop{0%{transform:scale(.3);opacity:.9}70%{opacity:.35}100%{transform:scale(1.5);opacity:0}}
+/* 打勾从 22px 放大到 36px，并加一圈扩散的绿环——22px 夹在一行文字里看不见 */
+.qtick{display:inline-flex;align-items:center;justify-content:center;position:relative;
+  width:36px;height:36px;vertical-align:-11px;margin-right:6px;
+  animation:tickIn .34s var(--ease-standard) both}
+.qtick svg{display:block;width:36px;height:36px}
+.qtick::before{content:"";position:absolute;inset:-4px;border-radius:var(--radius-full);
+  border:2px solid var(--color-success);animation:ringPop .55s .05s var(--ease-standard) both}
+.qtick path{stroke:var(--color-success);stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:20;stroke-dashoffset:20;animation:draw .34s .06s var(--ease-standard) forwards}
 @keyframes shake{15%{transform:translateX(-5px)}30%{transform:translateX(5px)}45%{transform:translateX(-4px)}
   60%{transform:translateX(4px)}80%{transform:translateX(-2px)}100%{transform:translateX(0)}}
 .qin.no{animation:shake .38s var(--ease-standard)}
@@ -754,15 +766,21 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
 
 /* 满分彩纸：14 个小方块，纯 CSS，900ms 后自己消失 */
 .confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-.confetti i{position:absolute;left:50%;top:34%;width:8px;height:8px;border-radius:2px;opacity:0;
+/* 火花不裁切：反馈卡只有 110px 高，裁了就基本看不见。它 pointer-events:none，飞出去不挡任何东西 */
+.spark{position:absolute;inset:0;pointer-events:none}
+.confetti i,.spark i{position:absolute;border-radius:2px;opacity:0;
   animation:burst .9s var(--ease-standard) forwards}
+.confetti i{left:50%;top:34%;width:8px;height:8px}
+/* 连对时反馈卡里迸出的小火花：比结果页的彩纸更小、飞得更近 */
+.spark i{left:50%;top:44%;width:7px;height:7px;animation-duration:.8s}
 @keyframes burst{0%{opacity:1;transform:translate(0,0) rotate(0)}
   100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}}
 
 @media (prefers-reduced-motion: reduce){
-  .fb,.streak.pop,.qin.no,.confetti i{animation:none}
+  .fb,.streak.pop,.qin.no,.confetti i,.spark i,.qtick,.qtick::before{animation:none}
   .qtick path{animation:none;stroke-dashoffset:0}
-  .confetti{display:none}
+  .qtick::before{display:none}
+  .confetti,.spark{display:none}
 }
 
 /* 题型选择器。打字时整条收起——用不到，且 iOS 键盘弹起时固定底栏会飘到
@@ -1296,10 +1314,12 @@ const NOTE = n => 523.25 * Math.pow(2, n / 12);          // C5 起算
 /* 连对越多起始音越高、音符越多——每题都一样的奖励等于没有奖励 */
 function sfxOK(streak) {
   const base = [0, 0, 2, 4, 5, 7][Math.min(streak, 5)];
-  tone(NOTE(base),      0,    .17, .16);
-  tone(NOTE(base + 4), .065,  .19, .14);
-  tone(NOTE(base + 7), .13,   .24, .12);
-  if (streak >= 5) tone(NOTE(base + 12), .195, .30, .10);
+  // 五音快速上行 + 两声高音点缀。后三音用三角波：泛音更多、更亮，
+  // 「答对了」需要被听见，柔和的正弦琶音在实际使用里几乎没有存在感
+  [0, 4, 7, 12, 16].forEach((n, i) =>
+    tone(NOTE(base + n), i * .045, .20, .20, i > 2 ? 'triangle' : 'sine'));
+  tone(NOTE(base + 19), .235, .28, .13, 'triangle');
+  tone(NOTE(base + 24), .30,  .34, .09, 'triangle');
 }
 function sfxNo() { tone(196, 0, .15, .09, 'triangle'); tone(155, .085, .20, .08, 'triangle'); }
 function sfxFinish(perfect) {
@@ -1509,7 +1529,8 @@ function feedback(w, ok, d) {
   const bh = $('bHint'); if (bh) bh.disabled = true;             // 判完分了，首字母提示不该还能点
   const gradeText = !ok ? '记为「忘记」' : hinted ? '用了提示，记为「模糊」' : '记为「记得」';
   let h = `<div class="card fb">
-    <div class="tag ${ok ? 'ok' : 'no'}">${ok ? '<svg class="qtick" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg>正确' : '✗ 不对'}
+    ${ok && streak >= 3 ? sparkHTML() : ''}
+    <div class="tag ${ok ? 'ok' : 'no'}">${ok ? '<span class="qtick"><svg viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6"/></svg></span>正确' : '✗ 不对'}
       <span style="color:var(--color-text-disabled);font-weight:400">· ${gradeText}</span>`
     // 反馈卡每题只插入一次，不存在 paintPg 那种重绘重放的问题，所以一直带 pop
     + (ok && streak >= 3 ? ` <span class="streak pop${streak >= 5 ? ' hot' : ''}">连对 ${streak}</span>` : '')
@@ -1576,17 +1597,20 @@ function result() {
     startQuiz(wrong.map(x => x.w), Object.fromEntries(wrong.map(x => [x.w.id, x.t])));
 }
 
-function confettiHTML() {
+/* 结果页的彩纸与反馈卡的火花是同一套东西，只差片数与飞散距离 */
+function burstHTML(cls, n, near, far, drop) {
   const cols = ['var(--color-success)', 'var(--color-warning)', 'var(--color-brand)', 'var(--color-error)'];
-  let h = '<div class="confetti">';
-  for (let i = 0; i < 14; i++) {
-    const ang = (i / 14) * Math.PI * 2 + Math.random() * .4, dist = 90 + Math.random() * 110;
+  let h = `<div class="${cls}">`;
+  for (let i = 0; i < n; i++) {
+    const ang = (i / n) * Math.PI * 2 + Math.random() * .4, dist = near + Math.random() * (far - near);
     h += `<i style="background:${cols[i % 4]};--dx:${(Math.cos(ang) * dist).toFixed(0)}px;`
-       + `--dy:${(Math.sin(ang) * dist + 40).toFixed(0)}px;--rot:${(Math.random() * 540 - 270).toFixed(0)}deg;`
+       + `--dy:${(Math.sin(ang) * dist + drop).toFixed(0)}px;--rot:${(Math.random() * 540 - 270).toFixed(0)}deg;`
        + `animation-delay:${i * 14}ms"></i>`;
   }
   return h + '</div>';
 }
+const confettiHTML = () => burstHTML('confetti', 14, 90, 200, 40);
+const sparkHTML    = () => burstHTML('spark',   10, 46, 92, 0);
 
 /* ---------- 词表 ---------- */
 let q = '';
