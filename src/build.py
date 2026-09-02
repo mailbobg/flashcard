@@ -14,19 +14,22 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 from phon import PHON                       # noqa: E402
 from phon_phy import PHON_PHY               # noqa: E402
+from phon_daily import PHON_DAILY           # noqa: E402
 from trans import TRANS                     # noqa: E402
 from extra import EXTRA                     # noqa: E402
 from lessons import LESSONS                 # noqa: E402
 from frames_phy import FRAMES_PHY           # noqa: E402
+from daily import BATCHES as DAILY_BATCHES  # noqa: E402
 try:
     from trans_phy import TRANS_PHY          # noqa: E402  Task 10 才填
 except ImportError:
     TRANS_PHY = {}
 
-_dup = set(PHON) & set(PHON_PHY)
-if _dup:
-    raise SystemExit('phon_phy.py 重复定义了 phon.py 已有的词: %s' % sorted(_dup))
-PHON = {**PHON, **PHON_PHY}                 # 物理独有词补进来，同名词沿用 phon.py 的
+for _name, _extra in (('phon_phy.py', PHON_PHY), ('phon_daily.py', PHON_DAILY)):
+    _dup = set(PHON) & set(_extra)
+    if _dup:
+        raise SystemExit('%s 重复定义了已有的词: %s' % (_name, sorted(_dup)))
+    PHON = {**PHON, **_extra}               # 各书独有词补进来，同名词沿用先加载的那份
 STRICT_PHON = True                           # phon_phy.py 已填满，缺词一律视为错误
 
 
@@ -60,6 +63,7 @@ def enrich(it, book):
 
 SCI = {'id': 'sci', 'cn': '科学', 'credit': 'IGCSE 自然科学英语核心词汇表'}
 PHY = {'id': 'phy', 'cn': '物理', 'credit': 'Cambridge IGCSE Physics 0625 核心词汇表'}
+DAILY = {'id': 'daily', 'cn': '日常', 'credit': '日常手写笔记'}
 
 
 def build_sci():
@@ -101,9 +105,20 @@ def build_phy():
     return {**PHY, 'sections': secs, 'frames': FRAMES_PHY}
 
 
+def build_daily():
+    """日常词表：src/daily.py 是唯一来源，按录入批次分章。
+
+    批次即章节——日常词没有主题可分，按字母分则每加一批章节都会重排、
+    「按主题学习」的进度条会失去意义。按批次分章节永远稳定。"""
+    secs = [{'id': i + 1, 'cn': b['cn'], 'en': b.get('en', ''),
+             'words': [enrich(it, 'daily') for it in b['words']]}
+            for i, b in enumerate(DAILY_BATCHES)]
+    return {**DAILY, 'sections': secs, 'frames': []}
+
+
 def build_data():
     # {**SCI, **book} 让缓存分支也一定带上最新的 cn / credit
-    data = {'books': [{**SCI, **build_sci()}, build_phy()]}
+    data = {'books': [{**SCI, **build_sci()}, build_phy(), build_daily()]}
     json.dump(data, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'),
               ensure_ascii=False, separators=(',', ':'))
     return data
