@@ -746,6 +746,21 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
   .confetti{display:none}
 }
 
+/* 题型选择器。打字时整条收起——用不到，且 iOS 键盘弹起时固定底栏会飘到
+   键盘上方，正好压住「提交」 */
+.qlock{flex:0 0 auto;display:flex;gap:6px;justify-content:center;
+  padding:9px var(--spacing-4) calc(var(--safe-b) + 9px);
+  border-top:var(--border-width) solid var(--color-border);
+  background:var(--color-background-card);
+  transition:opacity var(--duration-fast) var(--ease-standard),
+             transform var(--duration-fast) var(--ease-standard)}
+.qlock button{flex:0 0 auto;background:var(--color-background-muted);border:0;color:var(--color-text-secondary);
+  font-family:inherit;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);
+  padding:7px 13px;border-radius:var(--radius-full);white-space:nowrap}
+.qlock button.on{background:var(--color-accent);color:var(--color-on-accent);font-weight:var(--font-weight-semibold)}
+body.typing .qlock{opacity:0;pointer-events:none;transform:translateY(100%)}
+@media (prefers-reduced-motion: reduce){ .qlock{transition:none} }
+
 /* 结果页 */
 .res{padding:var(--spacing-5) 0;position:relative}
 .res .big{text-align:center;font-size:var(--font-size-5xl);font-weight:var(--font-weight-bold);letter-spacing:-.03em}
@@ -812,6 +827,12 @@ input[type=range]{width:118px;accent-color:var(--color-accent);font-family:inher
     <div class="pg" id="qPg">0/0</div>
   </div>
   <div class="qbody" id="qBody"></div>
+  <div class="qlock" id="qLock">
+    <button data-lk="spell">拼写</button>
+    <button data-lk="mc">辨义</button>
+    <button data-lk="dict">听写</button>
+    <button data-lk="">智能</button>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -1327,6 +1348,7 @@ function startQuiz(pool) {
   if (!pool || !pool.length) { toast('没有可测的词'); return; }
   POOL = shuffle(pool.slice()); POOLI = 0; ROUND = 0;
   $('quiz').classList.add('on');
+  bindQuizLock();
   loadRound();
 }
 function loadRound() {
@@ -1335,6 +1357,17 @@ function loadRound() {
   if (!QZ.length) { POOL = shuffle(POOL); POOLI = 0; ROUND = 1; QZ = POOL.slice(0, ROUND_N); }
   qzi = 0; wrong = []; streak = 0; best = 0; t0 = Date.now();
   drawQ();
+}
+/* 顺序是 拼写/辨义/听写/智能，默认「智能」跟记忆盒子自动升级 */
+function bindQuizLock() {
+  $('qLock').querySelectorAll('button').forEach(b => {
+    b.classList.toggle('on', b.dataset.lk === S.set.quizLock);
+    b.onclick = () => {
+      S.set.quizLock = b.dataset.lk; save();
+      $('qLock').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      if (!answered) drawQ();              // 换题型立即重绘当前题；已作答的不动，免得丢反馈
+    };
+  });
 }
 $('qClose').onclick = () => {
   stopSpeak();
